@@ -1,0 +1,16 @@
+stateDiagram-v2
+    [*] --> ImportPlan: Upload PDF/Image
+    ImportPlan --> ConversionImage: PDF détecté
+    ImportPlan --> AnalyseVision: Image détectée
+    ConversionImage --> AnalyseVision
+    AnalyseVision --> ExtractionCotes: LLM Vision (GPT-4o/Claude)
+    ExtractionCotes --> DetectionElements: Cotes + annotations extraites
+    DetectionElements --> VerifDonnees: Éléments identifiés
+    VerifDonnees --> DemandeUser: Données manquantes (Q=0)
+    VerifDonnees --> CalculMetré: Données suffisantes (Q=1)
+    DemandeUser --> CalculMetré: User complète
+    CalculMetré --> ValidationUser: Résultats calculés
+    ValidationUser --> CorrectionManuelle: User corrige
+    ValidationUser --> GenerationRapport: User valide
+    CorrectionManuelle --> CalculMetré: Recalcul
+    GenerationRapport --> [*]: Export PDF/Excel/CSV

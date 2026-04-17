@@ -1,0 +1,44 @@
+erDiagram
+    USERS ||--o{ PROJECTS : possède
+    USERS ||--o{ MATERIAL_PARAMS : configure
+    USERS {
+        uuid id PK
+        string email
+        string password_hash
+        int token_quota
+        int tokens_used
+        date subscription_end
+    }
+    PROJECTS ||--o{ PLANS : contient
+    PROJECTS ||--o{ CALCULATION_RESULTS : produit
+    PROJECTS {
+        uuid id PK
+        uuid user_id FK
+        string name
+        timestamp created_at
+    }
+    PLANS {
+        uuid id PK
+        uuid project_id FK
+        string type "architecte|masse|toiture|interieur"
+        string file_url
+        jsonb extracted_data
+    }
+    MATERIAL_PARAMS {
+        uuid id PK
+        uuid user_id FK
+        string category "maconnerie|placo|toiture|fondation..."
+        string param_key
+        float param_value
+        string unit
+    }
+    CALCULATION_RESULTS {
+        uuid id PK
+        uuid project_id FK
+        string lot "terrassement|fondation|maconnerie..."
+        string ouvrage
+        float quantity
+        string unit
+        string source "auto|deduit|manuel"
+        jsonb justification
+    }

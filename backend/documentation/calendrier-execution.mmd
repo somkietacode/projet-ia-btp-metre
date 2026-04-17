@@ -1,0 +1,31 @@
+gantt
+    title Calendrier V1 - Plateforme IA BTP Métré
+    dateFormat  YYYY-MM-DD
+
+    section Sprint 1 - Fondations
+    Setup Docker/CI/CD           :s1a, 2026-04-21, 5d
+    Modèle BDD PostgreSQL        :s1b, after s1a, 5d
+    Auth + Quotas FastAPI        :s1c, after s1a, 7d
+    Frontend Auth + Layout       :s1d, after s1a, 7d
+    Init Qdrant + ingestion docs :s1e, after s1b, 5d
+
+    section Sprint 2 - Pipeline Vision
+    Service PDF to Image         :s2a, 2026-05-19, 3d
+    Agent Vision LangGraph       :s2b, after s2a, 10d
+    Agent Détection éléments     :s2c, after s2b, 7d
+    Frontend Upload + Preview    :s2d, 2026-05-19, 10d
+    Phoenix Monitoring           :s2e, 2026-05-19, 5d
+
+    section Sprint 3 - Moteur Calcul
+    Module Paramétrage métier    :s3a, 2026-06-15, 7d
+    Tools calcul LangGraph       :s3b, 2026-06-15, 12d
+    Agent Calcul + Validation    :s3c, after s3b, 8d
+    Frontend Paramétrage         :s3d, 2026-06-15, 10d
+    Frontend Résultats           :s3e, after s3d, 8d
+
+    section Sprint 4 - Export + Polish
+    Export PDF/Excel/CSV         :s4a, 2026-07-13, 7d
+    WebSocket progression        :s4b, 2026-07-13, 5d
+    Tests E2E + plans réels      :s4c, after s4a, 10d
+    Correction + Optimisation    :s4d, after s4c, 5d
+    Déploiement production       :s4e, after s4d, 3d

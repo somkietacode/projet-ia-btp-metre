@@ -1,0 +1,49 @@
+graph TB
+    subgraph Client["Frontend Angular"]
+        UI[Interface Utilisateur]
+        Upload[Module Upload Plans]
+        Params[Module Paramétrage]
+        Results[Module Résultats/Export]
+    end
+
+    subgraph API["Backend FastAPI"]
+        Auth[Auth + Quotas JWT]
+        Router[API Router]
+        WS[WebSocket Progression]
+    end
+
+    subgraph Agents["LangGraph - Orchestrateur Agentique"]
+        Orchestrator[Agent Orchestrateur]
+        VisionAgent[Agent Vision/OCR]
+        DetectionAgent[Agent Détection Éléments]
+        CalcAgent[Agent Calcul Métré]
+        ValidationAgent[Agent Validation]
+    end
+
+    subgraph Data["Couche Données"]
+        PG[(PostgreSQL)]
+        QD[(Qdrant Vectoriel)]
+    end
+
+    subgraph Infra["Infrastructure Docker"]
+        PDF2Img[PDF → Image Service]
+        Phoenix[Arize Phoenix Monitoring]
+    end
+
+    UI --> Router
+    Upload --> Router
+    Params --> Router
+    Router --> Auth
+    Auth --> Orchestrator
+    Orchestrator --> VisionAgent
+    Orchestrator --> DetectionAgent
+    Orchestrator --> CalcAgent
+    Orchestrator --> ValidationAgent
+    VisionAgent --> PDF2Img
+    VisionAgent --> QD
+    DetectionAgent --> QD
+    CalcAgent --> PG
+    CalcAgent --> QD
+    Orchestrator --> WS
+    WS --> Results
+    Phoenix -.-> Agents
