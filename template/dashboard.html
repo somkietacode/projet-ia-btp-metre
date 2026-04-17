@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MétréIA — Tableau de bord</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page-specific styles */
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .si-blue  { background: #EFF6FF; color: #2563EB; }
+    .si-green { background: #ECFDF5; color: #10B981; }
+    .si-amber { background: #FFFBEB; color: #F59E0B; }
+    .si-indigo{ background: #EEF2FF; color: #6366F1; }
+
+    .project-row-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sd-done    { background: #10B981; }
+    .sd-process { background: #F59E0B; animation: sd-pulse 1.8s infinite; }
+    .sd-error   { background: #EF4444; }
+    @keyframes sd-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .project-thumb {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #DBEAFE, #EEF2FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .project-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .proj-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--app-text);
+    }
+    .proj-sub {
+      font-size: 12px;
+      color: var(--app-subtext);
+    }
+
+    .quota-card {
+      background: var(--app-surface);
+      border: 1px solid var(--app-border);
+      border-radius: var(--r-lg);
+      padding: 20px 22px;
+    }
+    .quota-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .quota-title { font-size: 13px; font-weight: 600; color: var(--app-text); }
+    .quota-count { font-size: 13px; font-weight: 700; color: var(--blue-600); }
+    .quota-bar-full {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: var(--r-full);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .quota-bar-fill {
+      height: 100%;
+      background: var(--blue-600);
+      border-radius: var(--r-full);
+      transition: width .4s ease;
+    }
+    .quota-note { font-size: 12px; color: var(--app-subtext); }
+
+    .quick-action-card {
+      background: var(--app-surface);
+      border: 1px solid var(--app-border);
+      border-radius: var(--r-lg);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .quick-action-card:hover {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+      transform: translateY(-1px);
+    }
+    .qa-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--blue-50);
+      color: var(--blue-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .qa-title { font-size: 14px; font-weight: 600; color: var(--app-text); }
+    .qa-desc  { font-size: 12px; color: var(--app-subtext); margin-top: 2px; }
+
+    .table-action-btn {
+      padding: 5px 12px;
+      border-radius: var(--r-sm);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue-600);
+      background: var(--blue-50);
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .table-action-btn:hover { background: var(--blue-100); }
+
+    .notif-badge {
+      width: 20px; height: 20px;
+      background: var(--danger);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .page-cols {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+    }
+    @media (max-width: 1200px) {
+      .page-cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ═══════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+          <path d="M3 7h4v10H3zm7 4h4v6h-4zm7-7h4v17h-4z" fill="white"/>
+        </svg>
+      </div>
+      <span class="brand-name">MétréIA</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Principal</span>
+      <a href="dashboard.html" class="sidebar-link active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/></svg>
+        Tableau de bord
+      </a>
+      <a href="upload.html" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Nouveau projet
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Mes projets
+        <span class="badge-count">12</span>
+      </a>
+
+      <span class="nav-section-label" style="margin-top:8px;">Configuration</span>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
+        Paramètres matériaux
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Historique
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093M12 17h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Aide et support
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Martin Beaumont</div>
+          <div class="user-plan">Standard · 20€/mois</div>
+        </div>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="color:#4A5E78;flex-shrink:0;"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════
+       MAIN
+  ═══════════════════════════════════ -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="top-header">
+      <div class="breadcrumb">
+        <span>MétréIA</span>
+        <svg class="sep" width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="current">Tableau de bord</span>
+      </div>
+      <div class="header-actions">
+        <div class="header-quota">
+          <span>Quotas</span>
+          <div class="quota-bar">
+            <div class="quota-fill" style="width:48%;"></div>
+          </div>
+          <span style="font-weight:600;color:var(--app-text);">24/50</span>
+        </div>
+        <button class="btn btn-primary btn-sm">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          Nouveau projet
+        </button>
+        <div style="position:relative;cursor:pointer;">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" style="color:var(--app-subtext);"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="notif-badge" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;font-size:9px;">2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-title">Bonjour Martin 👋</div>
+        <div class="page-subtitle">Voici un aperçu de votre activité ce mois-ci.</div>
+      </div>
+
+      <!-- ── Stats row ── -->
+      <div class="grid-4 mb-6">
+        <div class="stat-card">
+          <div class="stat-icon si-blue">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="stat-label">Projets ce mois</div>
+          <div class="stat-value">24</div>
+          <div class="stat-change">↑ +8 vs mois précédent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-green">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3h6v4H9V3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="stat-label">Projets terminés</div>
+          <div class="stat-value">22</div>
+          <div class="stat-change" style="color:#10B981;">91 % de réussite</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-amber">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="stat-label">Temps moyen</div>
+          <div class="stat-value">13<span style="font-size:18px;font-weight:600;letter-spacing:0;"> min</span></div>
+          <div class="stat-change" style="color:#F59E0B;">↓ -2 min vs mois précédent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-indigo">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="stat-label">Exports réalisés</div>
+          <div class="stat-value">37</div>
+          <div class="stat-change">Excel · PDF · CSV</div>
+        </div>
+      </div>
+
+      <!-- ── Main columns ── -->
+      <div class="page-cols">
+
+        <!-- Left: projects table -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Projets récents</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select class="form-control" style="height:32px;font-size:13px;padding:0 8px;width:auto;">
+                  <option>Tous les statuts</option>
+                  <option>Terminé</option>
+                  <option>En cours</option>
+                </select>
+                <a href="#" class="btn btn-ghost btn-sm" style="font-size:13px;">Voir tout →</a>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Projet</th>
+                    <th>Lots analysés</th>
+                    <th>Date</th>
+                    <th>Durée</th>
+                    <th>Statut</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="project-name-cell">
+                        <div class="project-thumb">🏠</div>
+                        <div>
+                          <div class="proj-title">Maison Dupont — R+1</div>
+                          <div class="proj-sub">4 pages · 5 lots</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                        <span class="badge badge-auto">Auto ×22</span>
+                        <span class="badge badge-semi">Semi ×4</span>
+                      </div>
+                    </td>
+                    <td class="muted">16 avr. 2026</td>
+                    <td class="muted">12 min 48 s</td>
+                    <td>
+                      <div class="project-row-status">
+                        <span class="status-dot sd-done"></span>
+                        <span style="font-size:13px;color:#10B981;font-weight:600;">Terminé</span>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="resultats.html" class="table-action-btn">Voir</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="project-name-cell">
+                        <div class="project-thumb">🏢</div>
+                        <div>
+                          <div class="proj-title">Immeuble Martin — Lot A</div>
+                          <div class="proj-sub">8 pages · 6 lots</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:4px;">
+                        <span class="badge badge-auto">Auto ×18</span>
+                      </div>
+                    </td>
+                    <td class="muted">15 avr. 2026</td>
+                    <td class="muted">18 min 32 s</td>
+                    <td>
+                      <div class="project-row-status">
+                        <span class="status-dot sd-done"></span>
+                        <span style="font-size:13px;color:#10B981;font-weight:600;">Terminé</span>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="resultats.html" class="table-action-btn">Voir</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="project-name-cell">
+                        <div class="project-thumb">🏗️</div>
+                        <div>
+                          <div class="proj-title">Entrepôt Logistique</div>
+                          <div class="proj-sub">2 pages · 3 lots</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:4px;">
+                        <span class="badge badge-status">Analyse...</span>
+                      </div>
+                    </td>
+                    <td class="muted">17 avr. 2026</td>
+                    <td class="muted">En cours</td>
+                    <td>
+                      <div class="project-row-status">
+                        <span class="status-dot sd-process"></span>
+                        <span style="font-size:13px;color:#F59E0B;font-weight:600;">En cours</span>
+                      </div>
+                    </td>
+                    <td>
+                      <button class="table-action-btn" style="background:#FFFBEB;color:#F59E0B;">Attendre</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="project-name-cell">
+                        <div class="project-thumb">🏡</div>
+                        <div>
+                          <div class="proj-title">Villa Léger — Plain-pied</div>
+                          <div class="proj-sub">3 pages · 7 lots</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                        <span class="badge badge-auto">Auto ×31</span>
+                        <span class="badge badge-semi">Semi ×2</span>
+                      </div>
+                    </td>
+                    <td class="muted">14 avr. 2026</td>
+                    <td class="muted">11 min 05 s</td>
+                    <td>
+                      <div class="project-row-status">
+                        <span class="status-dot sd-done"></span>
+                        <span style="font-size:13px;color:#10B981;font-weight:600;">Terminé</span>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="resultats.html" class="table-action-btn">Voir</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="project-name-cell">
+                        <div class="project-thumb">🏚️</div>
+                        <div>
+                          <div class="proj-title">Rénovation Mairie</div>
+                          <div class="proj-sub">1 page · 2 lots</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display:flex;gap:4px;">
+                        <span class="badge badge-manual">Manuel ×3</span>
+                      </div>
+                    </td>
+                    <td class="muted">12 avr. 2026</td>
+                    <td class="muted">9 min 11 s</td>
+                    <td>
+                      <div class="project-row-status">
+                        <span class="status-dot sd-done"></span>
+                        <span style="font-size:13px;color:#10B981;font-weight:600;">Terminé</span>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="resultats.html" class="table-action-btn">Voir</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Widgets -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Quick actions -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Actions rapides</span>
+            </div>
+            <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+              <a href="upload.html" class="quick-action-card">
+                <div class="qa-icon">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <div class="qa-title">Analyser un plan</div>
+                  <div class="qa-desc">Déposer un PDF ou une image</div>
+                </div>
+              </a>
+              <a href="#" class="quick-action-card">
+                <div class="qa-icon" style="background:#ECFDF5;color:#10B981;">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <div class="qa-title">Exporter en masse</div>
+                  <div class="qa-desc">Excel groupé de tous les projets</div>
+                </div>
+              </a>
+              <a href="#" class="quick-action-card">
+                <div class="qa-icon" style="background:#F5F3FF;color:#7C3AED;">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </div>
+                <div>
+                  <div class="qa-title">Paramétrage matériaux</div>
+                  <div class="qa-desc">Configurer vos coefficients</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quota widget -->
+          <div class="quota-card">
+            <div class="quota-header">
+              <span class="quota-title">Quotas du mois</span>
+              <span class="quota-count">24 / 50</span>
+            </div>
+            <div class="quota-bar-full">
+              <div class="quota-bar-fill" style="width:48%;"></div>
+            </div>
+            <div class="quota-note">26 projets restants avant le 1er mai 2026</div>
+          </div>
+
+          <!-- Confidence summary -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Confiance globale (ce mois)</span>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                  <span style="font-size:13px;color:#10B981;font-weight:600;">Automatique</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--app-text);">83%</span>
+                </div>
+                <div style="height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;">
+                  <div style="height:100%;width:83%;background:#10B981;border-radius:999px;"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                  <span style="font-size:13px;color:#F59E0B;font-weight:600;">Semi-automatique</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--app-text);">13%</span>
+                </div>
+                <div style="height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;">
+                  <div style="height:100%;width:13%;background:#F59E0B;border-radius:999px;"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                  <span style="font-size:13px;color:#EF4444;font-weight:600;">Manuel</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--app-text);">4%</span>
+                </div>
+                <div style="height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;">
+                  <div style="height:100%;width:4%;background:#EF4444;border-radius:999px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /right -->
+
+      </div>
+      <!-- /page-cols -->
+
+    </div>
+    <!-- /page-body -->
+  </div>
+  <!-- /main-content -->
+
+</div>
+</body>
+</html>

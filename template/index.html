@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MétréIA — Automatisez votre métré BTP par l'Intelligence Artificielle</title>
+  <meta name="description" content="Transformez vos plans PDF en quantités chantier exploitables en 15 minutes. Abonnement unique 20€/mois. Vision IA · Export Excel/PDF · 8 lots couverts.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       MétréIA · Landing Page · Design Sombre Professionnel
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --bg:          #070B14;
+      --bg-2:        #0D1525;
+      --bg-3:        #132038;
+      --border:      rgba(255,255,255,0.07);
+      --border-h:    rgba(255,255,255,0.13);
+      --text-1:      #EEF2FF;
+      --text-2:      #7A90B4;
+      --text-3:      #435470;
+      --blue:        #2563EB;
+      --blue-l:      #60A5FA;
+      --blue-glow:   rgba(37,99,235,0.18);
+      --green:       #10B981;
+      --yellow:      #F59E0B;
+      --red:         #EF4444;
+      --max-w:       1160px;
+      --r-sm:  6px; --r-md: 10px; --r-lg: 16px; --r-xl: 24px; --r-f: 9999px;
+      --font: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: var(--r-md);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+    .btn-primary:hover {
+      background: #1D4ED8;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px var(--blue-glow);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-1);
+      border-color: var(--border-h);
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.04);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+      border: none;
+    }
+    .btn-ghost:hover { color: var(--text-1); }
+    .btn-lg { padding: 14px 30px; font-size: 15px; border-radius: var(--r-lg); }
+
+    /* ── Navigation ──────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(7,11,20,0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2px;
+      flex: 1;
+    }
+    .nav-links a {
+      padding: 7px 14px;
+      font-size: 14px;
+      color: var(--text-2);
+      border-radius: var(--r-sm);
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { color: var(--text-1); background: rgba(255,255,255,0.04); }
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .hero {
+      padding: 152px 0 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+    }
+    .hero-glow {
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse at center, rgba(37,99,235,0.14) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(37,99,235,0.10);
+      border: 1px solid rgba(37,99,235,0.28);
+      border-radius: var(--r-f);
+      font-size: 13px;
+      color: var(--blue-l);
+      font-weight: 500;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--blue-l);
+      border-radius: 50%;
+      animation: blink 2.4s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .hero h1 {
+      font-size: clamp(38px, 5.5vw, 66px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -2.5px;
+      color: var(--text-1);
+      max-width: 820px;
+      margin: 0 auto 22px;
+      position: relative;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue-l);
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text-2);
+      max-width: 580px;
+      margin: 0 auto 44px;
+      line-height: 1.68;
+      position: relative;
+    }
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .hero-note {
+      font-size: 13px;
+      color: var(--text-3);
+      position: relative;
+      margin-bottom: 64px;
+    }
+    .hero-note span { color: var(--text-2); }
+
+    /* ── Browser Mockup ──────────────────────────────────── */
+    .browser-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .browser-glow {
+      position: absolute;
+      inset: -30px;
+      background: radial-gradient(ellipse at center, rgba(37,99,235,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .browser {
+      position: relative;
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-h);
+      box-shadow: 0 2px 0 1px rgba(255,255,255,0.03), 0 40px 100px rgba(0,0,0,0.55);
+      background: #0E1826;
+    }
+    .browser-chrome {
+      height: 44px;
+      background: #141F32;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .b-dots { display: flex; gap: 7px; }
+    .b-dots span {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+    }
+    .b-dots span:nth-child(1) { background: #FF5F56; }
+    .b-dots span:nth-child(2) { background: #FFBD2E; }
+    .b-dots span:nth-child(3) { background: #27C93F; }
+    .b-url {
+      flex: 1;
+      max-width: 360px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--text-3);
+      font-family: 'Courier New', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Mock App UI inside browser ──────────────────────── */
+    .mock-app {
+      display: flex;
+      height: 420px;
+    }
+    /* Mock sidebar */
+    .mock-sidebar {
+      width: 200px;
+      background: #0C1421;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .ms-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #5A7299;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ms-item.active {
+      background: rgba(37,99,235,0.15);
+      color: #C5D5F0;
+      border-left: 2px solid #2563EB;
+    }
+    .ms-icon { width: 14px; height: 14px; opacity: 0.7; }
+    /* Mock main */
+    .mock-main {
+      flex: 1;
+      padding: 20px 24px;
+      overflow: hidden;
+      background: #0E1826;
+    }
+    .mock-proj-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mock-proj-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #D0DEFF;
+    }
+    .mock-proj-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .mock-export-btns { display: flex; gap: 6px; }
+    .mock-btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .mock-btn-blue { background: #2563EB; color: white; }
+    .mock-btn-out {
+      background: transparent;
+      color: #5A7299;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    /* Mock confidence summary */
+    .mock-conf-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .mock-conf-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .chip-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+    }
+    /* Mock table */
+    .mock-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .mock-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mock-table td {
+      padding: 9px 10px;
+      font-size: 12px;
+      color: #8AA5C8;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .mock-table td.t-name { color: #C5D5F0; font-weight: 500; }
+    .mock-table td.t-qty {
+      color: #EEF2FF;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: -0.3px;
+    }
+    .mock-table td.t-lot {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+    }
+    .conf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .cb-auto { color: #10B981; background: rgba(16,185,129,0.12); }
+    .cb-semi { color: #F59E0B; background: rgba(245,158,11,0.12); }
+    .cb-auto::before, .cb-semi::before {
+      content:''; width:5px; height:5px; border-radius:50%;
+    }
+    .cb-auto::before { background:#10B981; }
+    .cb-semi::before { background:#F59E0B; }
+
+    /* ── Trust Bar ───────────────────────────────────────── */
+    .trust {
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-2);
+    }
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+    .trust-val {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--text-1);
+      letter-spacing: -1.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .trust-lbl {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+    .trust-sep {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    /* ── Section base ────────────────────────────────────── */
+    .section {
+      padding: 100px 0;
+    }
+    .section-lbl {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--blue-l);
+      margin-bottom: 18px;
+    }
+    .section-lbl::before {
+      content:'';
+      width: 18px; height: 1px;
+      background: var(--blue-l);
+    }
+    .section-title {
+      font-size: clamp(28px, 3.5vw, 46px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      color: var(--text-1);
+      margin-bottom: 16px;
+      max-width: 680px;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-2);
+      max-width: 560px;
+      line-height: 1.68;
+    }
+
+    /* ── Steps (comment ça marche) ───────────────────────── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .step-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 32px 28px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: transparent;
+      transition: background 0.2s;
+    }
+    .step-card:hover { border-color: rgba(37,99,235,0.35); transform: translateY(-3px); }
+    .step-card:hover::before { background: linear-gradient(to right,var(--blue),var(--blue-l)); }
+    .step-num-box {
+      width: 44px; height: 44px;
+      background: var(--blue);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 22px;
+    }
+    .step-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 10px;
+    }
+    .step-card p {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.68;
+    }
+    .step-tag {
+      display: inline-flex;
+      margin-top: 16px;
+      padding: 3px 10px;
+      border-radius: var(--r-f);
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-3);
+    }
+
+    /* ── Features grid ───────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      margin-top: 56px;
+    }
+    .feat-card {
+      background: var(--bg);
+      padding: 32px 28px;
+      transition: background 0.18s;
+    }
+    .feat-card:hover { background: var(--bg-2); }
+    .feat-icon {
+      width: 44px; height: 44px;
+      background: rgba(37,99,235,0.10);
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--blue-l);
+    }
+    .feat-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 8px;
+    }
+    .feat-card p { font-size: 14px; color: var(--text-2); line-height: 1.62; }
+
+    /* ── Lots ────────────────────────────────────────────── */
+    .lots-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 48px;
+    }
+    .lot-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 18px;
+      transition: all 0.18s;
+    }
+    .lot-card:hover {
+      border-color: rgba(37,99,235,0.32);
+      background: rgba(37,99,235,0.05);
+      transform: translateY(-2px);
+    }
+    .lot-em { font-size: 26px; margin-bottom: 12px; }
+    .lot-name { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 6px; }
+    .lot-desc { font-size: 12px; color: var(--text-3); line-height: 1.52; }
+
+    /* ── Pricing ─────────────────────────────────────────── */
+    .pricing-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+      margin-top: 56px;
+    }
+    .pricing-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--blue), var(--blue-l));
+    }
+    .pricing-price {
+      font-size: 68px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      color: var(--text-1);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pricing-price sup {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0;
+      vertical-align: top;
+      margin-top: 14px;
+      display: inline-block;
+    }
+    .pricing-period { font-size: 14px; color: var(--text-3); margin-bottom: 28px; }
+    .pricing-feats { display: flex; flex-direction: column; gap: 11px; margin-bottom: 28px; }
+    .pf-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-2);
+    }
+    .pf-check {
+      width: 18px; height: 18px;
+      background: rgba(16,185,129,0.12);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .pricing-note {
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-3);
+    }
+    /* Cost breakdown table */
+    .cost-table {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 28px;
+    }
+    .cost-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 20px;
+    }
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .cost-row:last-child { border-bottom: none; }
+    .cost-row .label { color: var(--text-2); }
+    .cost-row .val { font-weight: 700; color: var(--text-1); font-family: monospace; }
+    .cost-row.highlight .label { color: var(--green); font-weight: 600; }
+    .cost-row.highlight .val { color: var(--green); font-size: 15px; }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .compare-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table td {
+      padding: 10px 10px;
+      font-size: 13px;
+      color: var(--text-2);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .compare-table tr.our { background: rgba(37,99,235,0.06); }
+    .compare-table tr.our td { color: var(--text-1); font-weight: 600; }
+    .compare-table td.price-col { font-family: monospace; font-weight: 700; }
+
+    /* ── CTA section ─────────────────────────────────────── */
+    .cta-section {
+      padding: 80px 0;
+    }
+    .cta-box {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 72px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 700px; height: 350px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.11) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cta-box h2 {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: var(--text-1);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .cta-box p {
+      font-size: 17px;
+      color: var(--text-2);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      position: relative;
+    }
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      position: relative;
+    }
+    .cta-legal {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 16px;
+      position: relative;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-3);
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: var(--text-2); }
+    .footer-copy { font-size: 13px; color: var(--text-3); }
+
+    /* ── Misc ────────────────────────────────────────────── */
+    .text-center { text-align: center; }
+    .text-blue { color: var(--blue-l); }
+    .divider-h {
+      height: 1px;
+      background: var(--border);
+      margin: 60px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════════════ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <div class="brand-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+            <path d="M3 7h4v10H3zm7 4h4v6h-4zm7-7h4v17h-4z" fill="white"/>
+          </svg>
+        </div>
+        MétréIA
+      </a>
+      <ul class="nav-links">
+        <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+        <li><a href="#comment-ca-marche">Comment ça marche</a></li>
+        <li><a href="#lots">Lots couverts</a></li>
+        <li><a href="#tarifs">Tarifs</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost">Connexion</a>
+        <a href="upload.html" class="btn btn-primary">Commencer — 20€/mois</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="container" style="position:relative;">
+
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Plateforme IA Agentique · BTP
+      </div>
+
+      <h1>
+        De votre plan PDF<br>
+        à vos quantités,<br>
+        <em>en 15 minutes.</em>
+      </h1>
+
+      <p class="hero-sub">
+        Uploadez votre plan — l'IA extrait les cotes, identifie les éléments et calcule les quantités par lot. Export Excel et PDF prêts à l'emploi.
+      </p>
+
+      <div class="hero-actions">
+        <a href="upload.html" class="btn btn-primary btn-lg">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Commencer maintenant
+        </a>
+        <a href="#comment-ca-marche" class="btn btn-secondary btn-lg">
+          Voir comment ça marche
+        </a>
+      </div>
+
+      <p class="hero-note">
+        Abonnement <span>20€/mois HT</span> · Sans engagement · Annulable à tout moment
+      </p>
+
+      <!-- ── Browser Mockup ── -->
+      <div class="browser-wrap">
+        <div class="browser-glow"></div>
+        <div class="browser">
+          <div class="browser-chrome">
+            <div class="b-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="b-url">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="opacity:.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>
+              app.metria.fr/projets/maison-dupont/resultats
+            </div>
+          </div>
+          <div class="mock-app">
+            <!-- Sidebar -->
+            <div class="mock-sidebar">
+              <div style="font-size:11px;font-weight:700;color:#2B3F5C;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px 8px;margin-bottom:4px;">Navigation</div>
+              <div class="ms-item">
+                <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                Tableau de bord
+              </div>
+              <div class="ms-item active">
+                <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Mes projets
+              </div>
+              <div class="ms-item">
+                <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Nouveau projet
+              </div>
+              <div class="ms-item">
+                <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.5"/></svg>
+                Paramètres
+              </div>
+            </div>
+            <!-- Main content -->
+            <div class="mock-main">
+              <div class="mock-proj-header">
+                <div>
+                  <div class="mock-proj-name">Maison Dupont — R+1 — Résultats</div>
+                  <div class="mock-proj-meta">Analysé le 17 avr. 2026 · 4 pages · 12 min 48 sec</div>
+                </div>
+                <div class="mock-export-btns">
+                  <div class="mock-btn mock-btn-out">📊 Excel</div>
+                  <div class="mock-btn mock-btn-blue">📄 PDF</div>
+                </div>
+              </div>
+              <div class="mock-conf-row">
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#10B981;"></span><span style="color:#10B981;font-size:11px;font-weight:600;">22 automatique</span></div>
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#F59E0B;"></span><span style="color:#F59E0B;font-size:11px;font-weight:600;">4 semi-auto</span></div>
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#EF4444;"></span><span style="color:#EF4444;font-size:11px;font-weight:600;">1 manuel</span></div>
+              </div>
+              <table class="mock-table">
+                <thead>
+                  <tr>
+                    <th>Lot</th>
+                    <th>Ouvrage</th>
+                    <th>Quantité</th>
+                    <th>Unité</th>
+                    <th>Confiance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="t-lot">Maçonnerie</td>
+                    <td class="t-name">Murs extérieurs bruts</td>
+                    <td class="t-qty">126.40</td>
+                    <td style="color:#435470;font-size:11px;">m²</td>
+                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-lot">Maçonnerie</td>
+                    <td class="t-name">Parpaings 20×20×50</td>
+                    <td class="t-qty">2 940</td>
+                    <td style="color:#435470;font-size:11px;">unité</td>
+                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-lot">Fondations</td>
+                    <td class="t-name">Béton fondation filante</td>
+                    <td class="t-qty">18.50</td>
+                    <td style="color:#435470;font-size:11px;">m³</td>
+                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-lot">Carrelage</td>
+                    <td class="t-name">Carrelage sol RDC</td>
+                    <td class="t-qty">84.20</td>
+                    <td style="color:#435470;font-size:11px;">m²</td>
+                    <td><span class="conf-badge cb-semi">Semi-auto</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-lot">Toiture</td>
+                    <td class="t-name">Tuiles canal 22×42</td>
+                    <td class="t-qty">1 820</td>
+                    <td style="color:#435470;font-size:11px;">unité</td>
+                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /browser mockup -->
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TRUST BAR
+  ═══════════════════════════════════════════════════════ -->
+  <div class="trust">
+    <div class="container">
+      <div class="trust-grid">
+        <div>
+          <div class="trust-val">20€</div>
+          <div class="trust-lbl">par mois, abonnement unique</div>
+        </div>
+        <div>
+          <div class="trust-val">15 min</div>
+          <div class="trust-lbl">par projet en moyenne</div>
+        </div>
+        <div>
+          <div class="trust-val">8 lots</div>
+          <div class="trust-lbl">couverts en version V1</div>
+        </div>
+        <div>
+          <div class="trust-val">~50</div>
+          <div class="trust-lbl">projets inclus par mois</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       COMMENT ÇA MARCHE
+  ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="comment-ca-marche">
+    <div class="container">
+      <div class="section-lbl">Comment ça marche</div>
+      <h2 class="section-title">Trois étapes. Zéro formation requise.</h2>
+      <p class="section-sub">
+        Notre pipeline IA agentique traite votre plan de façon autonome, étape par étape, avec transparence totale sur chaque résultat.
+      </p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num-box">1</div>
+          <h3>Uploadez vos plans</h3>
+          <p>Déposez votre fichier PDF ou image (scan, photo). Le système convertit automatiquement le document en haute résolution pour l'analyse.</p>
+          <span class="step-tag">PDF · PNG · JPG · TIFF</span>
+        </div>
+        <div class="step-card">
+          <div class="step-num-box">2</div>
+          <h3>L'IA analyse et calcule</h3>
+          <p>La Vision IA lit les cotes, identifie murs, ouvertures, toiture… et applique les formules métier. Elle vous demande les données manquantes si besoin.</p>
+          <span class="step-tag">Claude Vision · LangGraph · ~12 min</span>
+        </div>
+        <div class="step-card">
+          <div class="step-num-box">3</div>
+          <h3>Exportez vos quantités</h3>
+          <p>Vérifiez, corrigez si nécessaire, puis exportez votre tableau de quantités complet, prêt pour le chiffrage ou la commande de matériaux.</p>
+          <span class="step-tag">Excel · PDF · CSV</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FONCTIONNALITÉS
+  ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="fonctionnalites" style="padding-top:0;">
+    <div class="container">
+      <div class="section-lbl">Fonctionnalités</div>
+      <h2 class="section-title">Tout ce dont le professionnel du BTP a besoin.</h2>
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <h3>Vision IA sur plans architecturaux</h3>
+          <p>Analyse par Claude 3.5 Sonnet et GPT-4o Vision — les modèles les plus précis pour l'extraction de données depuis des plans techniques.</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <h3>8 lots couverts en V1</h3>
+          <p>Terrassement, fondations, maçonnerie, plâtrerie, carrelage, toiture, enduit et chape — tous les corps d'état essentiels.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Export Excel · PDF · CSV</h3>
+          <p>Téléchargement immédiat dans le format de votre choix. Fichiers structurés par lot, prêts pour intégration dans votre logiciel de chiffrage.</p>
+        </div>
+        <!-- Feature 4 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <h3>Paramétrage métier personnalisé</h3>
+          <p>Configurez vos dimensions de matériaux, coefficients de perte et hauteurs standard. Sauvegardés automatiquement pour tous vos projets suivants.</p>
+        </div>
+        <!-- Feature 5 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3h6v4H9V3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Résultats auditables à 3 niveaux</h3>
+          <p>Chaque quantité affiche sa source (cote lue / paramètre déduit / saisie manuelle) et la formule appliquée. Traçabilité totale pour la validation.</p>
+        </div>
+        <!-- Feature 6 -->
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Historique complet des projets</h3>
+          <p>Retrouvez, comparez et réexportez n'importe lequel de vos projets passés. Les paramètres de chaque analyse sont conservés indéfiniment.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LOTS COUVERTS
+  ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="lots" style="padding-top:0;">
+    <div class="container">
+      <div class="section-lbl">Lots couverts</div>
+      <h2 class="section-title">8 corps d'état pris en charge en V1.</h2>
+      <p class="section-sub">
+        Chaque lot produit des quantités précises avec justification : surfaces, volumes, linéaires et comptages.
+      </p>
+      <div class="lots-grid">
+        <div class="lot-card">
+          <div class="lot-em">🏗️</div>
+          <div class="lot-name">Terrassement</div>
+          <div class="lot-desc">Volume de fouilles, emprise au sol, décapage de terre végétale</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">⚙️</div>
+          <div class="lot-name">Fondations</div>
+          <div class="lot-desc">Linéaire de fondations filantes, volume béton, ferraillage estimé</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">🧱</div>
+          <div class="lot-name">Maçonnerie</div>
+          <div class="lot-desc">Surface de murs, parpaings/briques, déduction des ouvertures</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">🪟</div>
+          <div class="lot-name">Plâtrerie / Placo</div>
+          <div class="lot-desc">Surface de cloisons, plaques BA13, rails et montants en linéaire</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">🔲</div>
+          <div class="lot-name">Carrelage</div>
+          <div class="lot-desc">Surface sol par pièce, nombre de carreaux avec coefficient de perte</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">🏠</div>
+          <div class="lot-name">Toiture</div>
+          <div class="lot-desc">Surface de couverture, tuiles/ardoises, linéaire de faîtage et arêtiers</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">🖌️</div>
+          <div class="lot-name">Enduit / Crépi</div>
+          <div class="lot-desc">Surface de façades extérieures avec déduction des ouvertures</div>
+        </div>
+        <div class="lot-card">
+          <div class="lot-em">📐</div>
+          <div class="lot-name">Chape / Dalle</div>
+          <div class="lot-desc">Surface et volume de chape, épaisseur paramétrable par zone</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TARIFS
+  ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="tarifs" style="background:var(--bg-2);padding-top:100px;padding-bottom:100px;">
+    <div class="container">
+      <div class="section-lbl">Tarification</div>
+      <h2 class="section-title">Un prix. Un abonnement. Tout inclus.</h2>
+      <p class="section-sub">
+        Pas de surprises, pas de module payant. Tout l'outil pour un forfait mensuel inférieur au coût d'une heure de métreur.
+      </p>
+      <div class="pricing-wrap">
+        <!-- Pricing card -->
+        <div class="pricing-card">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue-l);margin-bottom:8px;">Abonnement Standard</div>
+          <div class="pricing-price"><sup>€</sup>20</div>
+          <div class="pricing-period">par mois · hors taxes · sans engagement</div>
+          <div class="pricing-feats">
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>~50 projets par mois inclus</span>
+            </div>
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>8 lots couverts — tous corps d'état V1</span>
+            </div>
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Export illimité — Excel, PDF, CSV</span>
+            </div>
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Paramétrage matériaux sauvegardé</span>
+            </div>
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Historique complet de tous vos projets</span>
+            </div>
+            <div class="pf-item">
+              <div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Justification source/formule sur chaque résultat</span>
+            </div>
+          </div>
+          <a href="upload.html" class="btn btn-primary" style="width:100%;justify-content:center;">Commencer maintenant</a>
+          <div class="pricing-note">
+            Annulable à tout moment · Paiement sécurisé par carte · Facture mensuelle incluse
+          </div>
+        </div>
+        <!-- Cost breakdown -->
+        <div>
+          <div class="cost-table">
+            <div class="cost-title">Transparence des coûts IA par projet</div>
+            <div class="cost-row">
+              <span class="label">Analyse vision (4 pages PDF)</span>
+              <span class="val">~0,08 $</span>
+            </div>
+            <div class="cost-row">
+              <span class="label">Calculs et vérifications IA</span>
+              <span class="val">~0,02 $</span>
+            </div>
+            <div class="cost-row">
+              <span class="label">Infrastructure serveur</span>
+              <span class="val">~0,02 $</span>
+            </div>
+            <div class="cost-row highlight">
+              <span class="label">Coût total par projet</span>
+              <span class="val">~0,12 $</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;font-size:13px;color:var(--text-3);line-height:1.6;">
+            50 projets × 0,12$ = <strong style="color:var(--text-2);">6$ de coûts</strong> pour <strong style="color:var(--green);">20€ de revenu</strong> — le service est économiquement pérenne.
+          </div>
+          <!-- Comparison table -->
+          <div style="margin-top:24px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:14px;">Comparaison avec l'existant</div>
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Solution</th>
+                  <th>Coût</th>
+                  <th>Temps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Métreur humain</td>
+                  <td class="price-col" style="color:#EF4444;">200–500€/proj</td>
+                  <td>4–8 heures</td>
+                </tr>
+                <tr>
+                  <td>Logiciel classique</td>
+                  <td class="price-col" style="color:var(--text-2);">50–200€/mois</td>
+                  <td>1–3 heures</td>
+                </tr>
+                <tr class="our">
+                  <td>MétréIA ✦</td>
+                  <td class="price-col" style="color:#10B981;">20€/mois</td>
+                  <td style="color:#10B981;">15 min</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       CTA FINAL
+  ═══════════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Prêt à gagner du temps sur vos métrés ?</h2>
+        <p>
+          Rejoignez les professionnels du BTP qui ont automatisé leur quantitatif. Votre premier projet en 15 minutes.
+        </p>
+        <div class="cta-actions">
+          <a href="upload.html" class="btn btn-primary btn-lg">
+            Commencer maintenant — 20€/mois
+          </a>
+          <a href="dashboard.html" class="btn btn-secondary btn-lg">
+            Voir la démo
+          </a>
+        </div>
+        <div class="cta-legal">Sans engagement · Annulable à tout moment · Support inclus</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a href="#" class="footer-brand">
+          <div class="brand-icon" style="width:26px;height:26px;border-radius:6px;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M3 7h4v10H3zm7 4h4v6h-4zm7-7h4v17h-4z" fill="white"/></svg>
+          </div>
+          MétréIA
+        </a>
+        <ul class="footer-links">
+          <li><a href="#">Fonctionnalités</a></li>
+          <li><a href="#">Tarifs</a></li>
+          <li><a href="#">Conditions d'utilisation</a></li>
+          <li><a href="#">Politique de confidentialité</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <div class="footer-copy">© 2026 MétréIA · Tous droits réservés</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

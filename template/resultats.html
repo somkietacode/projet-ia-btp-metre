@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MétréIA — Résultats · Maison Dupont</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Results page-specific styles */
+    .results-layout {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1200px) {
+      .results-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Lot filter tabs ── */
+    .lot-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .lot-tab {
+      padding: 6px 14px;
+      border-radius: var(--r-full);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--app-border);
+      background: var(--app-surface);
+      color: var(--app-subtext);
+      transition: all .15s;
+    }
+    .lot-tab:hover { border-color: var(--blue-500); color: var(--blue-600); }
+    .lot-tab.active {
+      background: var(--blue-600);
+      color: white;
+      border-color: var(--blue-600);
+    }
+
+    /* ── Justification inline ── */
+    .justif-cell {
+      font-size: 11px;
+      color: var(--app-subtext);
+      line-height: 1.4;
+      max-width: 200px;
+    }
+    .justif-formula {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      background: var(--gray-100);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--gray-600);
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    /* ── Edit inline ── */
+    .qty-edit {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .qty-val {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--app-text);
+    }
+    .qty-edit-btn {
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 3px;
+      display: flex;
+      transition: all .15s;
+      opacity: 0;
+    }
+    tr:hover .qty-edit-btn { opacity: 1; }
+    .qty-edit-btn:hover { color: var(--blue-600); background: var(--blue-50); }
+
+    /* ── Summary sidebar ── */
+    .lot-summary-row {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .lot-summary-row:last-child { border-bottom: none; }
+    .ls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .ls-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--app-text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ls-count {
+      font-size: 12px;
+      color: var(--app-subtext);
+    }
+    .ls-bar {
+      height: 4px;
+      background: var(--gray-100);
+      border-radius: var(--r-full);
+      overflow: hidden;
+    }
+    .ls-fill {
+      height: 100%;
+      border-radius: var(--r-full);
+    }
+    .ls-fill.auto   { background: var(--success); }
+    .ls-fill.semi   { background: var(--warning); }
+    .ls-fill.manual { background: var(--danger); }
+
+    /* ── Plan viewer placeholder ── */
+    .plan-viewer {
+      background: var(--gray-50);
+      border: 1px solid var(--app-border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .plan-viewer-header {
+      padding: 12px 16px;
+      background: var(--app-surface);
+      border-bottom: 1px solid var(--app-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .plan-viewer-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--app-text);
+    }
+    .plan-page-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ppn-btn {
+      width: 28px; height: 28px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--app-border);
+      background: var(--app-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--app-subtext);
+      transition: all .15s;
+    }
+    .ppn-btn:hover { border-color: var(--blue-500); color: var(--blue-600); }
+    .ppn-page { font-size: 12px; color: var(--app-subtext); }
+    .plan-canvas {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      position: relative;
+    }
+    /* SVG floor plan */
+    .floor-plan-svg { max-width: 100%; height: auto; }
+
+    /* ── Export buttons ── */
+    .export-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .export-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: var(--r-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .export-excel {
+      background: #F0FDF4;
+      color: #15803D;
+      border-color: #BBF7D0;
+    }
+    .export-excel:hover { background: #DCFCE7; border-color: #86EFAC; }
+    .export-pdf {
+      background: #FEF2F2;
+      color: #B91C1C;
+      border-color: #FECACA;
+    }
+    .export-pdf:hover { background: #FEE2E2; border-color: #FCA5A5; }
+    .export-csv {
+      background: var(--gray-50);
+      color: var(--gray-600);
+      border-color: var(--gray-200);
+    }
+    .export-csv:hover { background: var(--gray-100); }
+
+    /* ── Analysis summary banner ── */
+    .analysis-banner {
+      background: linear-gradient(to right, #EFF6FF, #F0FDF4);
+      border: 1px solid #BFDBFE;
+      border-radius: var(--r-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .ab-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .ab-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .abi-blue  { background: #DBEAFE; color: #1D4ED8; }
+    .abi-green { background: #D1FAE5; color: #065F46; }
+    .abi-amber { background: #FEF3C7; color: #92400E; }
+    .ab-item-label { font-size: 11px; color: var(--app-subtext); }
+    .ab-item-val   { font-size: 15px; font-weight: 800; color: var(--app-text); line-height: 1; }
+
+    /* ── Lot section header ── */
+    .lot-section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--gray-50);
+      border: 1px solid var(--app-border);
+      border-bottom: none;
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      margin-top: 20px;
+    }
+    .lot-section-header:first-of-type { margin-top: 0; }
+    .lsh-em { font-size: 18px; }
+    .lsh-name { font-size: 14px; font-weight: 700; color: var(--app-text); }
+    .lsh-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--app-subtext);
+    }
+    .lot-section-table {
+      border: 1px solid var(--app-border);
+      border-radius: 0 0 var(--r-md) var(--r-md);
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    /* ── Validation panel ── */
+    .validation-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--r-md);
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      font-size: 13px;
+      color: #92400E;
+      margin-bottom: 8px;
+    }
+    .vr-icon { flex-shrink: 0; }
+    .vr-text { flex: 1; }
+    .vr-action {
+      background: #F59E0B;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .vr-action:hover { background: #D97706; }
+
+    .confidence-legend {
+      display: flex;
+      gap: 14px;
+      padding: 10px 0;
+      border-top: 1px solid var(--app-border);
+      margin-top: 12px;
+    }
+    .cl-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--app-subtext);
+    }
+    .cl-dot { width: 8px; height: 8px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ═══════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+          <path d="M3 7h4v10H3zm7 4h4v6h-4zm7-7h4v17h-4z" fill="white"/>
+        </svg>
+      </div>
+      <span class="brand-name">MétréIA</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Principal</span>
+      <a href="dashboard.html" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/></svg>
+        Tableau de bord
+      </a>
+      <a href="upload.html" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Nouveau projet
+      </a>
+      <a href="#" class="sidebar-link active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Mes projets
+        <span class="badge-count">12</span>
+      </a>
+      <span class="nav-section-label" style="margin-top:8px;">Configuration</span>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
+        Paramètres matériaux
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Historique
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Martin Beaumont</div>
+          <div class="user-plan">Standard · 20€/mois</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════
+       MAIN
+  ═══════════════════════════════════ -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="top-header">
+      <div class="breadcrumb">
+        <a href="dashboard.html" style="color:var(--app-subtext);transition:color .15s;" onmouseover="this.style.color='var(--app-text)'" onmouseout="this.style.color='var(--app-subtext)'">Projets</a>
+        <svg class="sep" width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="current">Maison Dupont — R+1</span>
+      </div>
+      <div class="header-actions">
+        <div class="export-group">
+          <button class="export-btn export-excel">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8L14 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Excel
+          </button>
+          <button class="export-btn export-pdf">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8L14 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8"/></svg>
+            PDF
+          </button>
+          <button class="export-btn export-csv">CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Step indicator -->
+      <div class="steps-indicator">
+        <div class="step-item">
+          <div class="step-num done">✓</div>
+          <div class="step-text done">Upload &amp; Paramétrage</div>
+        </div>
+        <div class="step-connector done"></div>
+        <div class="step-item">
+          <div class="step-num done">✓</div>
+          <div class="step-text done">Analyse IA</div>
+        </div>
+        <div class="step-connector done"></div>
+        <div class="step-item">
+          <div class="step-num active">3</div>
+          <div class="step-text active">Résultats &amp; Export</div>
+        </div>
+      </div>
+
+      <!-- Analysis summary banner -->
+      <div class="analysis-banner">
+        <div class="ab-item">
+          <div class="ab-icon abi-blue">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="ab-item-label">Plan analysé</div>
+            <div class="ab-item-val">plan_maison_dupont.pdf · 4 pages</div>
+          </div>
+        </div>
+        <div class="ab-item">
+          <div class="ab-icon abi-blue">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="ab-item-label">Durée d'analyse</div>
+            <div class="ab-item-val">12 min 48 sec</div>
+          </div>
+        </div>
+        <div class="ab-item">
+          <div class="ab-icon abi-green">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3h6v4H9V3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="ab-item-label">Confiance globale</div>
+            <div class="ab-item-val" style="color:#15803D;">83% automatique</div>
+          </div>
+        </div>
+        <div class="ab-item">
+          <div class="ab-icon abi-amber">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="ab-item-label">Données manquantes</div>
+            <div class="ab-item-val" style="color:#B45309;">4 à compléter</div>
+          </div>
+        </div>
+        <span class="badge badge-done" style="font-size:13px;padding:6px 14px;">Analyse terminée</span>
+      </div>
+
+      <!-- Validation alerts -->
+      <div class="validation-row">
+        <span class="vr-icon">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span class="vr-text"><strong>Carrelage — Sol RDC :</strong> La hauteur sous plafond n'était pas lisible sur le plan. Valeur par défaut utilisée (2,50 m). Vérifiez si nécessaire.</span>
+        <button class="vr-action">Corriger</button>
+      </div>
+
+      <!-- ── Results layout ── -->
+      <div class="results-layout">
+
+        <!-- Left: main results table -->
+        <div>
+          <!-- Lot filter tabs -->
+          <div class="lot-tabs">
+            <div class="lot-tab active">Tous les lots</div>
+            <div class="lot-tab">🏗️ Terrassement</div>
+            <div class="lot-tab">⚙️ Fondations</div>
+            <div class="lot-tab">🧱 Maçonnerie</div>
+            <div class="lot-tab">🪟 Plâtrerie</div>
+            <div class="lot-tab">🔲 Carrelage</div>
+            <div class="lot-tab">🏠 Toiture</div>
+          </div>
+
+          <!-- ── LOT: Terrassement ── -->
+          <div class="lot-section-header">
+            <span class="lsh-em">🏗️</span>
+            <span class="lsh-name">Terrassement</span>
+            <span class="lsh-count">3 ouvrages</span>
+          </div>
+          <div class="lot-section-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ouvrage</th>
+                  <th>Quantité</th>
+                  <th>Unité</th>
+                  <th>Confiance</th>
+                  <th>Justification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500;">Volume fouilles en masse</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">48.60</span>
+                      <button class="qty-edit-btn" title="Modifier">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="muted">m³</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">
+                    L=12.10m × l=6.70m × h=0.60m
+                    <div class="justif-formula">V = L × l × h</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Emprise au sol bâtie</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">81.07</span>
+                      <button class="qty-edit-btn" title="Modifier">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">
+                    L=12.10m × l=6.70m
+                    <div class="justif-formula">S = L × l</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Décapage terre végétale</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">97.28</span>
+                      <button class="qty-edit-btn" title="Modifier">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Emprise + marge 20%
+                    <div class="justif-formula">S = 81.07 × 1.20</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ── LOT: Maçonnerie ── -->
+          <div class="lot-section-header" style="margin-top:12px;">
+            <span class="lsh-em">🧱</span>
+            <span class="lsh-name">Maçonnerie</span>
+            <span class="lsh-count">4 ouvrages</span>
+          </div>
+          <div class="lot-section-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ouvrage</th>
+                  <th>Quantité</th>
+                  <th>Unité</th>
+                  <th>Confiance</th>
+                  <th>Justification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500;">Murs extérieurs bruts</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">126.40</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Périmètre 37.60m × H=2.80m − ouvertures 18.48m²
+                    <div class="justif-formula">S = P×H − Σouv.</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Parpaings 20×20×50</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">2 940</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">unité</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">126.40 m² ÷ 0.10m² × 1.10 (perte 10%)
+                    <div class="justif-formula">N = S / s_unit × (1+τ)</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Cloisons intérieures Placo</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">68.20</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-semi">Semi-auto</span></td>
+                  <td class="justif-cell">HSP défaut 2.50m (non lu)
+                    <div class="justif-formula">S = L_clois × HSP_déf.</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Déductions ouvertures</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">18.48</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Σ(fen.+portes) = 6 fen.+3 portes
+                    <div class="justif-formula">ΣS_ouv = Σ(l×h)</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ── LOT: Carrelage ── -->
+          <div class="lot-section-header" style="margin-top:12px;">
+            <span class="lsh-em">🔲</span>
+            <span class="lsh-name">Carrelage</span>
+            <span class="lsh-count">3 ouvrages</span>
+          </div>
+          <div class="lot-section-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ouvrage</th>
+                  <th>Quantité</th>
+                  <th>Unité</th>
+                  <th>Confiance</th>
+                  <th>Justification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500;">Carrelage sol RDC</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">84.20</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-semi">Semi-auto</span></td>
+                  <td class="justif-cell">Σ surfaces pièces RDC
+                    <div class="justif-formula">S = Σ(L×l)_pièces</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Carreaux 60×60 (perte 10%)</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">234</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">unité</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">84.20m² ÷ 0.36m² × 1.10
+                    <div class="justif-formula">N = S / s_unit × (1+τ)</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Carrelage sol R+1</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">76.40</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Σ surfaces pièces R+1
+                    <div class="justif-formula">S = Σ(L×l)_pièces</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ── LOT: Toiture ── -->
+          <div class="lot-section-header" style="margin-top:12px;">
+            <span class="lsh-em">🏠</span>
+            <span class="lsh-name">Toiture</span>
+            <span class="lsh-count">3 ouvrages</span>
+          </div>
+          <div class="lot-section-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ouvrage</th>
+                  <th>Quantité</th>
+                  <th>Unité</th>
+                  <th>Confiance</th>
+                  <th>Justification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500;">Surface toiture (couverture)</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">98.50</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">m²</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Pente 35° · emprise 81.07m²
+                    <div class="justif-formula">S_toit = S_emp / cos(θ)</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Tuiles canal 22×42</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">1 820</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">unité</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">98.50m² ÷ 0.058m² × 1.07
+                    <div class="justif-formula">N = S / s_unit × (1+τ)</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">Linéaire de faîtage</td>
+                  <td>
+                    <div class="qty-edit">
+                      <span class="qty-val">12.10</span>
+                      <button class="qty-edit-btn" title="Modifier"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                  </td>
+                  <td class="muted">ml</td>
+                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td class="justif-cell">Longueur faîtage lue = 12.10m
+                    <div class="justif-formula">L_faîtage = cote plan</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+        <!-- /Left results -->
+
+        <!-- Right: Plan viewer + Summary -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:80px;">
+
+          <!-- Plan viewer -->
+          <div class="plan-viewer">
+            <div class="plan-viewer-header">
+              <span class="plan-viewer-title">📐 Visualisation du plan</span>
+              <div class="plan-page-nav">
+                <div class="ppn-btn">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </div>
+                <span class="ppn-page">Page 1 / 4</span>
+                <div class="ppn-btn">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="plan-canvas">
+              <!-- SVG Floor Plan (stylized) -->
+              <svg class="floor-plan-svg" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" style="max-height:260px;">
+                <!-- Background -->
+                <rect width="320" height="260" fill="#F8FAFC"/>
+                <!-- Outer walls (thick) -->
+                <rect x="30" y="30" width="260" height="200" fill="none" stroke="#1E293B" stroke-width="6" rx="2"/>
+                <!-- Interior wall vertical -->
+                <line x1="160" y1="30" x2="160" y2="160" stroke="#1E293B" stroke-width="4"/>
+                <!-- Interior wall horizontal -->
+                <line x1="30" y1="160" x2="290" y2="160" stroke="#1E293B" stroke-width="4"/>
+                <!-- Interior wall short -->
+                <line x1="160" y1="100" x2="290" y2="100" stroke="#1E293B" stroke-width="4"/>
+                <!-- Door openings (gaps) -->
+                <line x1="30" y1="160" x2="30" y2="190" stroke="#F8FAFC" stroke-width="7"/><!-- left door gap -->
+                <line x1="155" y1="155" x2="170" y2="155" stroke="#F8FAFC" stroke-width="7"/>
+                <!-- Windows (small lines on walls) -->
+                <!-- Top wall windows -->
+                <line x1="70" y1="30" x2="110" y2="30" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="210" y1="30" x2="250" y2="30" stroke="#3B82F6" stroke-width="5"/>
+                <!-- Right wall window -->
+                <line x1="290" y1="70" x2="290" y2="95" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="290" y1="120" x2="290" y2="145" stroke="#3B82F6" stroke-width="5"/>
+                <!-- Bottom wall window -->
+                <line x1="90" y1="230" x2="130" y2="230" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="180" y1="230" x2="230" y2="230" stroke="#3B82F6" stroke-width="5"/>
+
+                <!-- AI Detection overlays -->
+                <rect x="30" y="30" width="260" height="200" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.3)" stroke-width="1" stroke-dasharray="4 3" rx="1"/>
+
+                <!-- Room labels -->
+                <text x="90" y="100" font-family="Inter,sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Salon/Séjour</text>
+                <text x="90" y="112" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">38.40 m²</text>
+                <text x="230" y="72" font-family="Inter,sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Chambre 1</text>
+                <text x="230" y="84" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">14.20 m²</text>
+                <text x="230" y="132" font-family="Inter,sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Chambre 2</text>
+                <text x="230" y="144" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">12.60 m²</text>
+                <text x="110" y="198" font-family="Inter,sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Cuisine</text>
+                <text x="110" y="210" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">16.80 m²</text>
+                <text x="230" y="198" font-family="Inter,sans-serif" font-size="9" fill="#64748B" text-anchor="middle">SdB / WC</text>
+                <text x="230" y="210" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">8.20 m²</text>
+
+                <!-- Dimension annotations -->
+                <line x1="30" y1="20" x2="290" y2="20" stroke="#CBD5E1" stroke-width="1"/>
+                <line x1="30" y1="16" x2="30" y2="24" stroke="#CBD5E1" stroke-width="1"/>
+                <line x1="290" y1="16" x2="290" y2="24" stroke="#CBD5E1" stroke-width="1"/>
+                <text x="160" y="17" font-family="monospace" font-size="8" fill="#2563EB" text-anchor="middle">12.10 m</text>
+
+                <line x1="300" y1="30" x2="300" y2="230" stroke="#CBD5E1" stroke-width="1"/>
+                <line x1="296" y1="30" x2="304" y2="30" stroke="#CBD5E1" stroke-width="1"/>
+                <line x1="296" y1="230" x2="304" y2="230" stroke="#CBD5E1" stroke-width="1"/>
+                <text x="316" y="133" font-family="monospace" font-size="8" fill="#2563EB" text-anchor="middle" transform="rotate(90,316,133)">6.70 m</text>
+
+                <!-- North indicator -->
+                <text x="288" y="245" font-family="Inter,sans-serif" font-size="9" fill="#94A3B8">N ↑</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Lot summary -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Récapitulatif par lot</span>
+            </div>
+            <div class="card-body" style="padding:14px 18px;">
+              <div class="lot-summary-row">
+                <div class="ls-header">
+                  <span class="ls-name"><span>🏗️</span> Terrassement</span>
+                  <span class="ls-count">3 qté</span>
+                </div>
+                <div class="ls-bar"><div class="ls-fill auto" style="width:100%;"></div></div>
+              </div>
+              <div class="lot-summary-row">
+                <div class="ls-header">
+                  <span class="ls-name"><span>🧱</span> Maçonnerie</span>
+                  <span class="ls-count">4 qté</span>
+                </div>
+                <div class="ls-bar"><div class="ls-fill auto" style="width:75%;"></div></div>
+                <div class="ls-bar" style="margin-top:2px;"><div class="ls-fill semi" style="width:25%;"></div></div>
+              </div>
+              <div class="lot-summary-row">
+                <div class="ls-header">
+                  <span class="ls-name"><span>🔲</span> Carrelage</span>
+                  <span class="ls-count">3 qté</span>
+                </div>
+                <div class="ls-bar"><div class="ls-fill auto" style="width:67%;"></div></div>
+                <div class="ls-bar" style="margin-top:2px;"><div class="ls-fill semi" style="width:33%;"></div></div>
+              </div>
+              <div class="lot-summary-row">
+                <div class="ls-header">
+                  <span class="ls-name"><span>🏠</span> Toiture</span>
+                  <span class="ls-count">3 qté</span>
+                </div>
+                <div class="ls-bar"><div class="ls-fill auto" style="width:100%;"></div></div>
+              </div>
+              <div class="confidence-legend">
+                <div class="cl-item"><div class="cl-dot" style="background:#10B981;"></div> Automatique</div>
+                <div class="cl-item"><div class="cl-dot" style="background:#F59E0B;"></div> Semi-auto</div>
+                <div class="cl-item"><div class="cl-dot" style="background:#EF4444;"></div> Manuel</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export CTA -->
+          <div class="card" style="border-color:var(--blue-200);background:var(--blue-50);">
+            <div class="card-body" style="text-align:center;padding:20px;">
+              <div style="font-size:14px;font-weight:700;color:var(--app-text);margin-bottom:6px;">Tout est vérifié ?</div>
+              <div style="font-size:13px;color:var(--app-subtext);margin-bottom:16px;">Exportez votre tableau de quantités final.</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button class="btn btn-primary" style="width:100%;justify-content:center;">
+                  📊 Exporter en Excel
+                </button>
+                <button class="export-btn export-pdf" style="width:100%;justify-content:center;">
+                  📄 Exporter en PDF
+                </button>
+                <button class="export-btn export-csv" style="width:100%;justify-content:center;">
+                  Exporter en CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /Right -->
+
+      </div>
+      <!-- /results-layout -->
+
+    </div>
+    <!-- /page-body -->
+  </div>
+  <!-- /main-content -->
+
+</div>
+</body>
+</html>

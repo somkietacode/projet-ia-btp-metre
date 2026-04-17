@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MétréIA — Nouveau projet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Upload page-specific styles */
+    .upload-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .upload-layout { grid-template-columns: 1fr; }
+    }
+
+    .file-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      border-radius: var(--r-md);
+      margin-top: 12px;
+    }
+    .file-preview-icon {
+      width: 36px; height: 36px;
+      background: var(--blue-600);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .file-preview-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--app-text);
+    }
+    .file-preview-size {
+      font-size: 12px;
+      color: var(--app-subtext);
+    }
+    .file-preview-remove {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--app-subtext);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all .15s;
+    }
+    .file-preview-remove:hover { background: var(--gray-200); color: var(--danger); }
+
+    .lot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .lot-check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--app-border);
+      border-radius: var(--r-md);
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--app-surface);
+    }
+    .lot-check-item:hover {
+      border-color: var(--blue-500);
+      background: var(--blue-50);
+    }
+    .lot-check-item input[type="checkbox"] {
+      width: 15px; height: 15px;
+      accent-color: var(--blue-600);
+      cursor: pointer;
+    }
+    .lot-check-item .lot-em-s { font-size: 16px; }
+    .lot-check-item label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--app-text);
+      cursor: pointer;
+    }
+
+    .params-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .info-box {
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      display: flex;
+      gap: 10px;
+    }
+    .info-box-icon { color: var(--blue-600); flex-shrink: 0; margin-top: 1px; }
+    .info-box-text { font-size: 13px; color: var(--blue-700); line-height: 1.55; }
+    .info-box-text strong { font-weight: 600; }
+
+    .sidebar-summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 13px;
+    }
+    .sidebar-summary-item:last-child { border-bottom: none; }
+    .sidebar-summary-item .label { color: var(--app-subtext); }
+    .sidebar-summary-item .val { font-weight: 600; color: var(--app-text); }
+
+    .processing-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .ps-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .ps-waiting { background: var(--gray-100); color: var(--gray-400); }
+    .ps-active  { background: var(--blue-50); color: var(--blue-600); border: 2px solid var(--blue-200); }
+    .ps-done    { background: #ECFDF5; color: #10B981; }
+    .ps-label   { font-size: 13px; color: var(--app-subtext); }
+
+    .section-title-sm {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--app-text);
+      margin-bottom: 14px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 5px; }
+    .form-row-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--app-text);
+    }
+    .form-control-sm {
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--app-border);
+      border-radius: var(--r-md);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--app-text);
+      background: var(--app-surface);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+    .form-control-sm:focus {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    }
+    .form-control-sm::placeholder { color: var(--gray-400); }
+
+    .unit-input {
+      display: flex;
+      align-items: center;
+    }
+    .unit-input .form-control-sm {
+      border-radius: var(--r-md) 0 0 var(--r-md);
+      border-right: none;
+    }
+    .unit-badge {
+      height: 36px;
+      padding: 0 10px;
+      background: var(--gray-100);
+      border: 1px solid var(--app-border);
+      border-radius: 0 var(--r-md) var(--r-md) 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--app-subtext);
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ═══════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+          <path d="M3 7h4v10H3zm7 4h4v6h-4zm7-7h4v17h-4z" fill="white"/>
+        </svg>
+      </div>
+      <span class="brand-name">MétréIA</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Principal</span>
+      <a href="dashboard.html" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/></svg>
+        Tableau de bord
+      </a>
+      <a href="upload.html" class="sidebar-link active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Nouveau projet
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Mes projets
+        <span class="badge-count">12</span>
+      </a>
+      <span class="nav-section-label" style="margin-top:8px;">Configuration</span>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
+        Paramètres matériaux
+      </a>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Historique
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Martin Beaumont</div>
+          <div class="user-plan">Standard · 20€/mois</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════
+       MAIN
+  ═══════════════════════════════════ -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="top-header">
+      <div class="breadcrumb">
+        <a href="dashboard.html" style="color:var(--app-subtext);transition:color .15s;" onmouseover="this.style.color='var(--app-text)'" onmouseout="this.style.color='var(--app-subtext)'">Tableau de bord</a>
+        <svg class="sep" width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="current">Nouveau projet</span>
+      </div>
+      <div class="header-actions">
+        <div class="header-quota">
+          <span>Quotas</span>
+          <div class="quota-bar">
+            <div class="quota-fill" style="width:48%;"></div>
+          </div>
+          <span style="font-weight:600;color:var(--app-text);">24/50</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Step indicator -->
+      <div class="steps-indicator">
+        <div class="step-item">
+          <div class="step-num active">1</div>
+          <div class="step-text active">Upload &amp; Paramétrage</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">Analyse IA</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">Résultats &amp; Export</div>
+        </div>
+      </div>
+
+      <div class="upload-layout">
+
+        <!-- ── Left: Form ── -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Upload zone -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <span style="margin-right:6px;">📄</span>
+                Plans à analyser
+              </span>
+              <span style="font-size:12px;color:var(--app-subtext);">PDF, PNG, JPG, TIFF acceptés</span>
+            </div>
+            <div class="card-body">
+              <div class="drop-zone" onclick="document.getElementById('file-input').click();">
+                <div class="drop-zone-icon">
+                  <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3>Déposer vos plans ici</h3>
+                <p>ou <strong>cliquer pour parcourir</strong> vos fichiers</p>
+                <div class="formats">
+                  <span class="format-tag">PDF</span>
+                  <span class="format-tag">PNG</span>
+                  <span class="format-tag">JPG</span>
+                  <span class="format-tag">TIFF</span>
+                </div>
+                <p style="font-size:12px;color:var(--gray-400);margin-top:10px;">Taille max. 50 Mo par fichier · Jusqu'à 10 pages analysées</p>
+              </div>
+              <input type="file" id="file-input" style="display:none;" accept=".pdf,.png,.jpg,.jpeg,.tiff,.tif" multiple>
+
+              <!-- File preview (example) -->
+              <div class="file-preview">
+                <div class="file-preview-icon">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8L14 2z" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <div class="file-preview-name">plan_maison_dupont_rdc.pdf</div>
+                  <div class="file-preview-size">2,4 Mo · 4 pages</div>
+                </div>
+                <button class="file-preview-remove" title="Supprimer">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+
+              <div class="info-box" style="margin-top:12px;">
+                <span class="info-box-icon">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span class="info-box-text">
+                  <strong>Qualité du plan :</strong> Pour une extraction optimale, privilégiez un PDF natif (non scanné). Les plans au format image doivent être en résolution ≥ 150 dpi.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project name -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🏷️ Informations du projet</span>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+              <div class="form-group">
+                <label class="form-label">Nom du projet <span class="required">*</span></label>
+                <input type="text" class="form-control" placeholder="Ex : Maison Dupont — R+1 — Bordeaux" value="Maison Dupont — R+1">
+                <span class="form-hint">Ce nom apparaîtra dans votre historique et vos exports.</span>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Type de bâtiment</label>
+                  <select class="form-control">
+                    <option>Maison individuelle</option>
+                    <option>Immeuble collectif</option>
+                    <option>Local commercial</option>
+                    <option>Bâtiment industriel</option>
+                    <option>Autre</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Région / Département</label>
+                  <input type="text" class="form-control" placeholder="Ex : Gironde (33)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lots selection -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🏗️ Lots à analyser</span>
+              <button class="btn btn-ghost btn-sm" style="font-size:12px;">Tout sélectionner</button>
+            </div>
+            <div class="card-body">
+              <div class="lot-grid">
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">🏗️</span>
+                  <label>Terrassement</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">⚙️</span>
+                  <label>Fondations</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">🧱</span>
+                  <label>Maçonnerie</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">🪟</span>
+                  <label>Plâtrerie / Placo</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">🔲</span>
+                  <label>Carrelage</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox" checked>
+                  <span class="lot-em-s">🏠</span>
+                  <label>Toiture</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox">
+                  <span class="lot-em-s">🖌️</span>
+                  <label>Enduit / Crépi</label>
+                </label>
+                <label class="lot-check-item">
+                  <input type="checkbox">
+                  <span class="lot-em-s">📐</span>
+                  <label>Chape / Dalle</label>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parameters -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚙️ Paramètres métier</span>
+              <span style="font-size:12px;color:var(--app-subtext);">Pré-remplis depuis votre profil</span>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:20px;">
+
+              <div>
+                <div class="section-title-sm">Dimensions des matériaux</div>
+                <div class="params-grid">
+                  <div class="form-row">
+                    <label class="form-row-label">Parpaing (L × H)</label>
+                    <div style="display:flex;gap:6px;">
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="50">
+                        <span class="unit-badge">cm L</span>
+                      </div>
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="20">
+                        <span class="unit-badge">cm H</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Brique (L × H)</label>
+                    <div style="display:flex;gap:6px;">
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="22">
+                        <span class="unit-badge">cm L</span>
+                      </div>
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="11">
+                        <span class="unit-badge">cm H</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Plaque BA13 (L × H)</label>
+                    <div style="display:flex;gap:6px;">
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="250">
+                        <span class="unit-badge">cm L</span>
+                      </div>
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="120">
+                        <span class="unit-badge">cm H</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Tuile (L × l)</label>
+                    <div style="display:flex;gap:6px;">
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="42">
+                        <span class="unit-badge">cm L</span>
+                      </div>
+                      <div class="unit-input" style="flex:1;">
+                        <input type="number" class="form-control-sm" value="22">
+                        <span class="unit-badge">cm l</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider" style="margin:0;"></div>
+
+              <div>
+                <div class="section-title-sm">Paramètres généraux</div>
+                <div class="params-grid">
+                  <div class="form-row">
+                    <label class="form-row-label">Hauteur sous plafond (défaut)</label>
+                    <div class="unit-input">
+                      <input type="number" class="form-control-sm" value="2.50" step="0.05">
+                      <span class="unit-badge">m</span>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Épaisseur enduit / crépi</label>
+                    <div class="unit-input">
+                      <input type="number" class="form-control-sm" value="2.0" step="0.5">
+                      <span class="unit-badge">cm</span>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Épaisseur chape</label>
+                    <div class="unit-input">
+                      <input type="number" class="form-control-sm" value="6.0" step="0.5">
+                      <span class="unit-badge">cm</span>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-row-label">Coeff. de perte matériaux</label>
+                    <div class="unit-input">
+                      <input type="number" class="form-control-sm" value="10" min="0" max="30">
+                      <span class="unit-badge">%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <!-- /Left -->
+
+        <!-- ── Right: Summary + Submit ── -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:80px;">
+
+          <!-- Résumé -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Résumé de l'analyse</span>
+            </div>
+            <div class="card-body" style="padding:16px 18px;">
+              <div class="sidebar-summary-item">
+                <span class="label">Fichier</span>
+                <span class="val">plan_maison_dupont.pdf</span>
+              </div>
+              <div class="sidebar-summary-item">
+                <span class="label">Pages détectées</span>
+                <span class="val">4 pages</span>
+              </div>
+              <div class="sidebar-summary-item">
+                <span class="label">Lots sélectionnés</span>
+                <span class="val" style="color:var(--blue-600);">6 / 8</span>
+              </div>
+              <div class="sidebar-summary-item">
+                <span class="label">Durée estimée</span>
+                <span class="val">~12–18 min</span>
+              </div>
+              <div class="sidebar-summary-item">
+                <span class="label">Coût tokens</span>
+                <span class="val">~0,10 $</span>
+              </div>
+              <div class="sidebar-summary-item">
+                <span class="label">Quota consommé</span>
+                <span class="val">1 / 50 projets</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline steps preview -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Pipeline IA</span>
+            </div>
+            <div class="card-body" style="padding:14px 18px;">
+              <div class="processing-step">
+                <div class="ps-icon ps-waiting">1</div>
+                <span class="ps-label">Conversion PDF → images HD</span>
+              </div>
+              <div class="processing-step">
+                <div class="ps-icon ps-waiting">2</div>
+                <span class="ps-label">Vision IA — lecture des cotes</span>
+              </div>
+              <div class="processing-step">
+                <div class="ps-icon ps-waiting">3</div>
+                <span class="ps-label">Détection des éléments</span>
+              </div>
+              <div class="processing-step">
+                <div class="ps-icon ps-waiting">4</div>
+                <span class="ps-label">Calcul des quantités</span>
+              </div>
+              <div class="processing-step">
+                <div class="ps-icon ps-waiting">5</div>
+                <span class="ps-label">Validation et rapport</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <a href="resultats.html" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;font-size:15px;">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Lancer l'analyse IA
+          </a>
+          <p style="font-size:12px;color:var(--app-subtext);text-align:center;line-height:1.5;">
+            L'analyse se lance en arrière-plan. Vous serez notifié à la fin du traitement.
+          </p>
+          <button class="btn btn-outline" style="width:100%;justify-content:center;">
+            Annuler
+          </button>
+        </div>
+        <!-- /Right -->
+
+      </div>
+      <!-- /upload-layout -->
+
+    </div>
+    <!-- /page-body -->
+  </div>
+  <!-- /main-content -->
+
+</div>
+</body>
+</html>
