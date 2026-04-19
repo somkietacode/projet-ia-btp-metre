@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
       justify-content: center;
       margin-bottom: 16px;
     }
-    .si-blue  { background: #EFF6FF; color: #2563EB; }
+    .si-blue  { background: #F3F4F6; color: #111827; }
     .si-green { background: #ECFDF5; color: #10B981; }
     .si-amber { background: #FFFBEB; color: #F59E0B; }
     .si-indigo{ background: #EEF2FF; color: #6366F1; }
@@ -39,7 +39,7 @@
     .project-thumb {
       width: 36px; height: 36px;
       border-radius: 8px;
-      background: linear-gradient(135deg, #DBEAFE, #EEF2FF);
+      background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -104,7 +104,7 @@
     }
     .quick-action-card:hover {
       border-color: var(--blue-600);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
       transform: translateY(-1px);
     }
     .qa-icon {
@@ -327,8 +327,8 @@
                     </td>
                     <td>
                       <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                        <span class="badge badge-auto">Auto ×22</span>
-                        <span class="badge badge-semi">Semi ×4</span>
+                        <span class="badge badge-auto">OK ×22</span>
+                        <span class="badge badge-semi">Rév. ×4</span>
                       </div>
                     </td>
                     <td class="muted">16 avr. 2026</td>
@@ -355,7 +355,7 @@
                     </td>
                     <td>
                       <div style="display:flex;gap:4px;">
-                        <span class="badge badge-auto">Auto ×18</span>
+                        <span class="badge badge-auto">OK ×18</span>
                       </div>
                     </td>
                     <td class="muted">15 avr. 2026</td>
@@ -409,8 +409,8 @@
                     </td>
                     <td>
                       <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                        <span class="badge badge-auto">Auto ×31</span>
-                        <span class="badge badge-semi">Semi ×2</span>
+                        <span class="badge badge-auto">OK ×31</span>
+                        <span class="badge badge-semi">Rév. ×2</span>
                       </div>
                     </td>
                     <td class="muted">14 avr. 2026</td>
@@ -512,12 +512,12 @@
           <!-- Confidence summary -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Confiance globale (ce mois)</span>
+              <span class="card-title">Qualité des calculs (ce mois)</span>
             </div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
               <div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                  <span style="font-size:13px;color:#10B981;font-weight:600;">Automatique</span>
+                  <span style="font-size:13px;color:#10B981;font-weight:600;">Validé</span>
                   <span style="font-size:13px;font-weight:700;color:var(--app-text);">83%</span>
                 </div>
                 <div style="height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;">
@@ -526,7 +526,7 @@
               </div>
               <div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                  <span style="font-size:13px;color:#F59E0B;font-weight:600;">Semi-automatique</span>
+                  <span style="font-size:13px;color:#F59E0B;font-weight:600;">En révision</span>
                   <span style="font-size:13px;font-weight:700;color:var(--app-text);">13%</span>
                 </div>
                 <div style="height:6px;background:var(--gray-100);border-radius:999px;overflow:hidden;">

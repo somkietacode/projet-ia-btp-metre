@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -215,8 +215,8 @@
 
     /* ── Analysis summary banner ── */
     .analysis-banner {
-      background: linear-gradient(to right, #EFF6FF, #F0FDF4);
-      border: 1px solid #BFDBFE;
+      background: linear-gradient(to right, #F3F4F6, #F0FDF4);
+      border: 1px solid #E5E7EB;
       border-radius: var(--r-lg);
       padding: 16px 20px;
       display: flex;
@@ -240,7 +240,7 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .abi-blue  { background: #DBEAFE; color: #1D4ED8; }
+    .abi-blue  { background: #E5E7EB; color: #111827; }
     .abi-green { background: #D1FAE5; color: #065F46; }
     .abi-amber { background: #FEF3C7; color: #92400E; }
     .ab-item-label { font-size: 11px; color: var(--app-subtext); }
@@ -406,7 +406,7 @@
         <div class="step-connector done"></div>
         <div class="step-item">
           <div class="step-num done">✓</div>
-          <div class="step-text done">Analyse IA</div>
+          <div class="step-text done">Traitement automatique</div>
         </div>
         <div class="step-connector done"></div>
         <div class="step-item">
@@ -440,8 +440,8 @@
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3h6v4H9V3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div>
-            <div class="ab-item-label">Confiance globale</div>
-            <div class="ab-item-val" style="color:#15803D;">83% automatique</div>
+            <div class="ab-item-label">Qualité des calculs</div>
+            <div class="ab-item-val" style="color:#15803D;">83% certifiés</div>
           </div>
         </div>
         <div class="ab-item">
@@ -494,7 +494,7 @@
                   <th>Ouvrage</th>
                   <th>Quantité</th>
                   <th>Unité</th>
-                  <th>Confiance</th>
+                  <th>Statut</th>
                   <th>Justification</th>
                 </tr>
               </thead>
@@ -510,7 +510,7 @@
                     </div>
                   </td>
                   <td class="muted">m³</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">
                     L=12.10m × l=6.70m × h=0.60m
                     <div class="justif-formula">V = L × l × h</div>
@@ -527,7 +527,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">
                     L=12.10m × l=6.70m
                     <div class="justif-formula">S = L × l</div>
@@ -544,7 +544,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Emprise + marge 20%
                     <div class="justif-formula">S = 81.07 × 1.20</div>
                   </td>
@@ -566,7 +566,7 @@
                   <th>Ouvrage</th>
                   <th>Quantité</th>
                   <th>Unité</th>
-                  <th>Confiance</th>
+                  <th>Statut</th>
                   <th>Justification</th>
                 </tr>
               </thead>
@@ -580,7 +580,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Périmètre 37.60m × H=2.80m − ouvertures 18.48m²
                     <div class="justif-formula">S = P×H − Σouv.</div>
                   </td>
@@ -594,7 +594,7 @@
                     </div>
                   </td>
                   <td class="muted">unité</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">126.40 m² ÷ 0.10m² × 1.10 (perte 10%)
                     <div class="justif-formula">N = S / s_unit × (1+τ)</div>
                   </td>
@@ -608,7 +608,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-semi">Semi-auto</span></td>
+                  <td><span class="badge badge-semi">Contrôlé</span></td>
                   <td class="justif-cell">HSP défaut 2.50m (non lu)
                     <div class="justif-formula">S = L_clois × HSP_déf.</div>
                   </td>
@@ -622,7 +622,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Σ(fen.+portes) = 6 fen.+3 portes
                     <div class="justif-formula">ΣS_ouv = Σ(l×h)</div>
                   </td>
@@ -644,7 +644,7 @@
                   <th>Ouvrage</th>
                   <th>Quantité</th>
                   <th>Unité</th>
-                  <th>Confiance</th>
+                  <th>Statut</th>
                   <th>Justification</th>
                 </tr>
               </thead>
@@ -658,7 +658,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-semi">Semi-auto</span></td>
+                  <td><span class="badge badge-semi">Contrôlé</span></td>
                   <td class="justif-cell">Σ surfaces pièces RDC
                     <div class="justif-formula">S = Σ(L×l)_pièces</div>
                   </td>
@@ -672,7 +672,7 @@
                     </div>
                   </td>
                   <td class="muted">unité</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">84.20m² ÷ 0.36m² × 1.10
                     <div class="justif-formula">N = S / s_unit × (1+τ)</div>
                   </td>
@@ -686,7 +686,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Σ surfaces pièces R+1
                     <div class="justif-formula">S = Σ(L×l)_pièces</div>
                   </td>
@@ -708,7 +708,7 @@
                   <th>Ouvrage</th>
                   <th>Quantité</th>
                   <th>Unité</th>
-                  <th>Confiance</th>
+                  <th>Statut</th>
                   <th>Justification</th>
                 </tr>
               </thead>
@@ -722,7 +722,7 @@
                     </div>
                   </td>
                   <td class="muted">m²</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Pente 35° · emprise 81.07m²
                     <div class="justif-formula">S_toit = S_emp / cos(θ)</div>
                   </td>
@@ -736,7 +736,7 @@
                     </div>
                   </td>
                   <td class="muted">unité</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">98.50m² ÷ 0.058m² × 1.07
                     <div class="justif-formula">N = S / s_unit × (1+τ)</div>
                   </td>
@@ -750,7 +750,7 @@
                     </div>
                   </td>
                   <td class="muted">ml</td>
-                  <td><span class="badge badge-auto">Automatique</span></td>
+                  <td><span class="badge badge-auto">Validé</span></td>
                   <td class="justif-cell">Longueur faîtage lue = 12.10m
                     <div class="justif-formula">L_faîtage = cote plan</div>
                   </td>
@@ -797,14 +797,14 @@
                 <line x1="155" y1="155" x2="170" y2="155" stroke="#F8FAFC" stroke-width="7"/>
                 <!-- Windows (small lines on walls) -->
                 <!-- Top wall windows -->
-                <line x1="70" y1="30" x2="110" y2="30" stroke="#3B82F6" stroke-width="5"/>
-                <line x1="210" y1="30" x2="250" y2="30" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="70" y1="30" x2="110" y2="30" stroke="#4B5563" stroke-width="5"/>
+                <line x1="210" y1="30" x2="250" y2="30" stroke="#4B5563" stroke-width="5"/>
                 <!-- Right wall window -->
-                <line x1="290" y1="70" x2="290" y2="95" stroke="#3B82F6" stroke-width="5"/>
-                <line x1="290" y1="120" x2="290" y2="145" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="290" y1="70" x2="290" y2="95" stroke="#4B5563" stroke-width="5"/>
+                <line x1="290" y1="120" x2="290" y2="145" stroke="#4B5563" stroke-width="5"/>
                 <!-- Bottom wall window -->
-                <line x1="90" y1="230" x2="130" y2="230" stroke="#3B82F6" stroke-width="5"/>
-                <line x1="180" y1="230" x2="230" y2="230" stroke="#3B82F6" stroke-width="5"/>
+                <line x1="90" y1="230" x2="130" y2="230" stroke="#4B5563" stroke-width="5"/>
+                <line x1="180" y1="230" x2="230" y2="230" stroke="#4B5563" stroke-width="5"/>
 
                 <!-- AI Detection overlays -->
                 <rect x="30" y="30" width="260" height="200" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.3)" stroke-width="1" stroke-dasharray="4 3" rx="1"/>
@@ -825,12 +825,12 @@
                 <line x1="30" y1="20" x2="290" y2="20" stroke="#CBD5E1" stroke-width="1"/>
                 <line x1="30" y1="16" x2="30" y2="24" stroke="#CBD5E1" stroke-width="1"/>
                 <line x1="290" y1="16" x2="290" y2="24" stroke="#CBD5E1" stroke-width="1"/>
-                <text x="160" y="17" font-family="monospace" font-size="8" fill="#2563EB" text-anchor="middle">12.10 m</text>
+                <text x="160" y="17" font-family="monospace" font-size="8" fill="#4B5563" text-anchor="middle">12.10 m</text>
 
                 <line x1="300" y1="30" x2="300" y2="230" stroke="#CBD5E1" stroke-width="1"/>
                 <line x1="296" y1="30" x2="304" y2="30" stroke="#CBD5E1" stroke-width="1"/>
                 <line x1="296" y1="230" x2="304" y2="230" stroke="#CBD5E1" stroke-width="1"/>
-                <text x="316" y="133" font-family="monospace" font-size="8" fill="#2563EB" text-anchor="middle" transform="rotate(90,316,133)">6.70 m</text>
+                <text x="316" y="133" font-family="monospace" font-size="8" fill="#4B5563" text-anchor="middle" transform="rotate(90,316,133)">6.70 m</text>
 
                 <!-- North indicator -->
                 <text x="288" y="245" font-family="Inter,sans-serif" font-size="9" fill="#94A3B8">N ↑</text>
@@ -875,9 +875,9 @@
                 <div class="ls-bar"><div class="ls-fill auto" style="width:100%;"></div></div>
               </div>
               <div class="confidence-legend">
-                <div class="cl-item"><div class="cl-dot" style="background:#10B981;"></div> Automatique</div>
-                <div class="cl-item"><div class="cl-dot" style="background:#F59E0B;"></div> Semi-auto</div>
-                <div class="cl-item"><div class="cl-dot" style="background:#EF4444;"></div> Manuel</div>
+                <div class="cl-item"><div class="cl-dot" style="background:#10B981;"></div> Certifié</div>
+                <div class="cl-item"><div class="cl-dot" style="background:#F59E0B;"></div> En révision</div>
+                <div class="cl-item"><div class="cl-dot" style="background:#EF4444;"></div> Saisi</div>
               </div>
             </div>
           </div>

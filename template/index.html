@@ -1,27 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MétréIA — Automatisez votre métré BTP par l'Intelligence Artificielle</title>
-  <meta name="description" content="Transformez vos plans PDF en quantités chantier exploitables en 15 minutes. Abonnement unique 20€/mois. Vision IA · Export Excel/PDF · 8 lots couverts.">
+  <title>MétréIA — Automatisez votre métré BTP  Métrés BTP rapides et précis</title>
+  <meta name="description" content="Transformez vos plans PDF en quantités chantier exploitables en 15 minutes. Abonnement unique 20€/mois. Lecture automatisée · Export Excel/PDF · 8 lots couverts.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     /* ═══════════════════════════════════════════════════════
-       MétréIA · Landing Page · Design Sombre Professionnel
+       MétréIA · Landing Page · Design Clair Professionnel
     ═══════════════════════════════════════════════════════ */
     :root {
-      --bg:          #070B14;
-      --bg-2:        #0D1525;
-      --bg-3:        #132038;
-      --border:      rgba(255,255,255,0.07);
-      --border-h:    rgba(255,255,255,0.13);
-      --text-1:      #EEF2FF;
-      --text-2:      #7A90B4;
-      --text-3:      #435470;
-      --blue:        #2563EB;
-      --blue-l:      #60A5FA;
-      --blue-glow:   rgba(37,99,235,0.18);
+      --bg:          #F8FAFC;
+      --bg-2:        #FFFFFF;
+      --bg-3:        #F1F5F9;
+      --border:      #E2E8F0;
+      --border-h:    #CBD5E1;
+      --text-1:      #0D1421;
+      --text-2:      #576477;
+      --text-3:      #94A3B8;
+      --blue:        #111827;
+      --blue-l:      #4B5563;
+      --blue-glow:   rgba(0,0,0,0.06);
       --green:       #10B981;
       --yellow:      #F59E0B;
       --red:         #EF4444;
@@ -69,7 +69,7 @@
       border-color: var(--blue);
     }
     .btn-primary:hover {
-      background: #1D4ED8;
+      background: #030712;
       transform: translateY(-1px);
       box-shadow: 0 6px 28px var(--blue-glow);
     }
@@ -79,8 +79,8 @@
       border-color: var(--border-h);
     }
     .btn-secondary:hover {
-      border-color: rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.04);
+      border-color: #94A3B8;
+      background: rgba(0,0,0,0.03);
     }
     .btn-ghost {
       background: transparent;
@@ -95,10 +95,11 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(7,11,20,0.82);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 #E2E8F0;
     }
     .nav-inner {
       max-width: var(--max-w);
@@ -153,7 +154,7 @@
     .hero-grid {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
       background-size: 30px 30px;
       pointer-events: none;
     }
@@ -162,7 +163,7 @@
       top: -60px; left: 50%;
       transform: translateX(-50%);
       width: 900px; height: 500px;
-      background: radial-gradient(ellipse at center, rgba(37,99,235,0.14) 0%, transparent 68%);
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.03) 0%, transparent 68%);
       pointer-events: none;
     }
     .hero-badge {
@@ -170,8 +171,8 @@
       align-items: center;
       gap: 8px;
       padding: 6px 16px;
-      background: rgba(37,99,235,0.10);
-      border: 1px solid rgba(37,99,235,0.28);
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.12);
       border-radius: var(--r-f);
       font-size: 13px;
       color: var(--blue-l);
@@ -233,7 +234,7 @@
     .browser-glow {
       position: absolute;
       inset: -30px;
-      background: radial-gradient(ellipse at center, rgba(37,99,235,0.12) 0%, transparent 65%);
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.04) 0%, transparent 65%);
       pointer-events: none;
     }
     .browser {
@@ -303,9 +304,9 @@
       gap: 8px;
     }
     .ms-item.active {
-      background: rgba(37,99,235,0.15);
+      background: rgba(255,255,255,0.10);
       color: #C5D5F0;
-      border-left: 2px solid #2563EB;
+      border-left: 2px solid #9CA3AF;
     }
     .ms-icon { width: 14px; height: 14px; opacity: 0.7; }
     /* Mock main */
@@ -340,7 +341,7 @@
       font-size: 11px;
       font-weight: 600;
     }
-    .mock-btn-blue { background: #2563EB; color: white; }
+    .mock-btn-blue { background: #111827; color: white; }
     .mock-btn-out {
       background: transparent;
       color: #5A7299;
@@ -506,7 +507,7 @@
       background: transparent;
       transition: background 0.2s;
     }
-    .step-card:hover { border-color: rgba(37,99,235,0.35); transform: translateY(-3px); }
+    .step-card:hover { border-color: rgba(0,0,0,0.12); transform: translateY(-3px); }
     .step-card:hover::before { background: linear-gradient(to right,var(--blue),var(--blue-l)); }
     .step-num-box {
       width: 44px; height: 44px;
@@ -561,7 +562,7 @@
     .feat-card:hover { background: var(--bg-2); }
     .feat-icon {
       width: 44px; height: 44px;
-      background: rgba(37,99,235,0.10);
+      background: rgba(0,0,0,0.06);
       border-radius: var(--r-md);
       display: flex;
       align-items: center;
@@ -592,8 +593,8 @@
       transition: all 0.18s;
     }
     .lot-card:hover {
-      border-color: rgba(37,99,235,0.32);
-      background: rgba(37,99,235,0.05);
+      border-color: rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.03);
       transform: translateY(-2px);
     }
     .lot-em { font-size: 26px; margin-bottom: 12px; }
@@ -711,7 +712,7 @@
       color: var(--text-2);
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .compare-table tr.our { background: rgba(37,99,235,0.06); }
+    .compare-table tr.our { background: #F3F4F6; }
     .compare-table tr.our td { color: var(--text-1); font-weight: 600; }
     .compare-table td.price-col { font-family: monospace; font-weight: 700; }
 
@@ -734,7 +735,7 @@
       top: 50%; left: 50%;
       transform: translate(-50%,-50%);
       width: 700px; height: 350px;
-      background: radial-gradient(ellipse, rgba(37,99,235,0.11) 0%, transparent 65%);
+      background: radial-gradient(ellipse, rgba(0,0,0,0.04) 0%, transparent 65%);
       pointer-events: none;
     }
     .cta-box h2 {
@@ -843,7 +844,7 @@
 
       <div class="hero-badge">
         <span class="dot"></span>
-        Plateforme IA Agentique · BTP
+        Automatisation documentaire · BTP
       </div>
 
       <h1>
@@ -853,7 +854,7 @@
       </h1>
 
       <p class="hero-sub">
-        Uploadez votre plan — l'IA extrait les cotes, identifie les éléments et calcule les quantités par lot. Export Excel et PDF prêts à l'emploi.
+        Uploadez votre plan — le logiciel extrait les cotes, identifie les éléments et calcule les quantités par lot. Export Excel et PDF prêts à l'emploi.
       </p>
 
       <div class="hero-actions">
@@ -917,9 +918,9 @@
                 </div>
               </div>
               <div class="mock-conf-row">
-                <div class="mock-conf-chip"><span class="chip-dot" style="background:#10B981;"></span><span style="color:#10B981;font-size:11px;font-weight:600;">22 automatique</span></div>
-                <div class="mock-conf-chip"><span class="chip-dot" style="background:#F59E0B;"></span><span style="color:#F59E0B;font-size:11px;font-weight:600;">4 semi-auto</span></div>
-                <div class="mock-conf-chip"><span class="chip-dot" style="background:#EF4444;"></span><span style="color:#EF4444;font-size:11px;font-weight:600;">1 manuel</span></div>
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#10B981;"></span><span style="color:#10B981;font-size:11px;font-weight:600;">22 certifiés</span></div>
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#F59E0B;"></span><span style="color:#F59E0B;font-size:11px;font-weight:600;">4 en révision</span></div>
+                <div class="mock-conf-chip"><span class="chip-dot" style="background:#EF4444;"></span><span style="color:#EF4444;font-size:11px;font-weight:600;">1 saisi</span></div>
               </div>
               <table class="mock-table">
                 <thead>
@@ -928,7 +929,7 @@
                     <th>Ouvrage</th>
                     <th>Quantité</th>
                     <th>Unité</th>
-                    <th>Confiance</th>
+                    <th>Statut</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -937,35 +938,35 @@
                     <td class="t-name">Murs extérieurs bruts</td>
                     <td class="t-qty">126.40</td>
                     <td style="color:#435470;font-size:11px;">m²</td>
-                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                    <td><span class="conf-badge cb-auto">Validé</span></td>
                   </tr>
                   <tr>
                     <td class="t-lot">Maçonnerie</td>
                     <td class="t-name">Parpaings 20×20×50</td>
                     <td class="t-qty">2 940</td>
                     <td style="color:#435470;font-size:11px;">unité</td>
-                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                    <td><span class="conf-badge cb-auto">Validé</span></td>
                   </tr>
                   <tr>
                     <td class="t-lot">Fondations</td>
                     <td class="t-name">Béton fondation filante</td>
                     <td class="t-qty">18.50</td>
                     <td style="color:#435470;font-size:11px;">m³</td>
-                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                    <td><span class="conf-badge cb-auto">Validé</span></td>
                   </tr>
                   <tr>
                     <td class="t-lot">Carrelage</td>
                     <td class="t-name">Carrelage sol RDC</td>
                     <td class="t-qty">84.20</td>
                     <td style="color:#435470;font-size:11px;">m²</td>
-                    <td><span class="conf-badge cb-semi">Semi-auto</span></td>
+                    <td><span class="conf-badge cb-semi">Contrôlé</span></td>
                   </tr>
                   <tr>
                     <td class="t-lot">Toiture</td>
                     <td class="t-name">Tuiles canal 22×42</td>
                     <td class="t-qty">1 820</td>
                     <td style="color:#435470;font-size:11px;">unité</td>
-                    <td><span class="conf-badge cb-auto">Automatique</span></td>
+                    <td><span class="conf-badge cb-auto">Validé</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1012,7 +1013,7 @@
       <div class="section-lbl">Comment ça marche</div>
       <h2 class="section-title">Trois étapes. Zéro formation requise.</h2>
       <p class="section-sub">
-        Notre pipeline IA agentique traite votre plan de façon autonome, étape par étape, avec transparence totale sur chaque résultat.
+        Notre pipeline de traitement automatisé analyse votre plan de façon autonome, étape par étape, avec transparence totale sur chaque résultat.
       </p>
       <div class="steps-grid">
         <div class="step-card">
@@ -1023,9 +1024,9 @@
         </div>
         <div class="step-card">
           <div class="step-num-box">2</div>
-          <h3>L'IA analyse et calcule</h3>
-          <p>La Vision IA lit les cotes, identifie murs, ouvertures, toiture… et applique les formules métier. Elle vous demande les données manquantes si besoin.</p>
-          <span class="step-tag">Claude Vision · LangGraph · ~12 min</span>
+          <h3>Le moteur analyse et calcule</h3>
+          <p>Le Moteur ScanMap™ détecte les cotes, identifie murs, ouvertures, toiture… et applique les formules métier. Il vous demande les données manquantes si besoin.</p>
+          <span class="step-tag">ScanMap™ · Traitement vectoriel · ~12 min</span>
         </div>
         <div class="step-card">
           <div class="step-num-box">3</div>
@@ -1050,8 +1051,8 @@
           <div class="feat-icon">
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
           </div>
-          <h3>Vision IA sur plans architecturaux</h3>
-          <p>Analyse par Claude 3.5 Sonnet et GPT-4o Vision — les modèles les plus précis pour l'extraction de données depuis des plans techniques.</p>
+          <h3>Lecture optique avancée sur plans architecturaux</h3>
+          <p>Notre Moteur ScanMap™ offre une précision documentaire inégalée pour l'extraction de données depuis vos plans techniques. Reconnu par les professionnels du BTP.</p>
         </div>
         <!-- Feature 2 -->
         <div class="feat-card">
@@ -1199,32 +1200,33 @@
             Annulable à tout moment · Paiement sécurisé par carte · Facture mensuelle incluse
           </div>
         </div>
-        <!-- Cost breakdown -->
+        <!-- Garanties & Comparaison -->
         <div>
-          <div class="cost-table">
-            <div class="cost-title">Transparence des coûts IA par projet</div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:16px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:20px;">Ce qui est inclus dans votre abonnement</div>
             <div class="cost-row">
-              <span class="label">Analyse vision (4 pages PDF)</span>
-              <span class="val">~0,08 $</span>
+              <span class="label">Projets par mois</span>
+              <span class="val">~50 projets</span>
             </div>
             <div class="cost-row">
-              <span class="label">Calculs et vérifications IA</span>
-              <span class="val">~0,02 $</span>
+              <span class="label">Lots couverts</span>
+              <span class="val">8 corps d'état</span>
             </div>
             <div class="cost-row">
-              <span class="label">Infrastructure serveur</span>
-              <span class="val">~0,02 $</span>
+              <span class="label">Exports</span>
+              <span class="val">Illimités</span>
+            </div>
+            <div class="cost-row">
+              <span class="label">Paramétrage matériaux</span>
+              <span class="val">Sauvegardé</span>
             </div>
             <div class="cost-row highlight">
-              <span class="label">Coût total par projet</span>
-              <span class="val">~0,12 $</span>
+              <span class="label">Abonnement tout inclus</span>
+              <span class="val">20€/mois</span>
             </div>
           </div>
-          <div style="margin-top:16px;font-size:13px;color:var(--text-3);line-height:1.6;">
-            50 projets × 0,12$ = <strong style="color:var(--text-2);">6$ de coûts</strong> pour <strong style="color:var(--green);">20€ de revenu</strong> — le service est économiquement pérenne.
-          </div>
           <!-- Comparison table -->
-          <div style="margin-top:24px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:14px;">Comparaison avec l'existant</div>
             <table class="compare-table">
               <thead>
