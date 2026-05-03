@@ -1,0 +1,65 @@
+<div class="admin-home-content">
+    <div class="page-header">
+        <h1 class="page-title">Tableau de bord</h1>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="loading-state" *ngIf="isLoading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Chargement...
+    </div>
+
+    <ng-container *ngIf="!isLoading && !errorMessage">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#e8f0fe"><i class="fa-solid fa-users" style="color:#1e3a5f"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ totalUsers }}</span>
+                    <span class="stat-label">Utilisateurs</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fef3c7"><i class="fa-solid fa-bolt" style="color:#d97706"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ totalQuotaUsed }}</span>
+                    <span class="stat-label">Quota total consommé</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#d1fae5"><i class="fa-solid fa-layer-group" style="color:#059669"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">{{ plans.length }}</span>
+                    <span class="stat-label">Plans disponibles</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers utilisateurs inscrits -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2>Derniers inscrits</h2>
+                <a routerLink="/admin/dashboard/users" class="see-all">Voir tous <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <table class="users-table" *ngIf="recentUsers.length > 0; else empty">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Quota utilisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of recentUsers">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td><span class="plan-badge">{{ getPlanName(user.plan_id) }}</span></td>
+                        <td>{{ user.quota_used }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <ng-template #empty><p class="empty-state">Aucun utilisateur enregistré.</p></ng-template>
+        </div>
+    </ng-container>
+</div>

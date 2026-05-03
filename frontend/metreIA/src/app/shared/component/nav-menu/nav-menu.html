@@ -1,0 +1,11 @@
+<div class="nav-menu" [ngClass]="{'collapsed': isCollapsed}">
+    <ul class="menu-items">
+        <li *ngFor="let item of menuItems" class="menu-item" routerLinkActive="active">
+            <a [routerLink]="item.route">
+                <i class="{{item.icon}}"></i>
+                <span class="menu-text" *ngIf="!isCollapsed">{{ item.name }}</span>
+            </a>
+        </li>
+    </ul>
+    <i class="{{isCollapsed ? 'fa-solid fa-angle-right' : 'fa-solid fa-angle-left'}}" (click)="toggleMenu()"></i>
+</div>

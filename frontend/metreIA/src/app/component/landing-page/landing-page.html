@@ -1,0 +1,339 @@
+<app-header></app-header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="container" style="position:relative;">
+
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Automatisation documentaire · BTP
+    </div>
+
+    <h1>
+      De votre plan PDF<br>
+      à vos quantités,<br>
+      <em>en 15 minutes.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Uploadez votre plan — le logiciel extrait les cotes, identifie les éléments et calcule les quantités par lot. Export Excel et PDF prêts à l'emploi.
+    </p>
+
+    <div class="hero-actions">
+      <a [routerLink]="['/auth/signup']" class="btn btn-primary btn-lg">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Essayer gratuitement
+      </a>
+      <a href="#comment-ca-marche" class="btn btn-secondary btn-lg">Voir comment ça marche</a>
+    </div>
+
+    <p class="hero-note">
+      <span>Essai gratuit inclus</span> · Puis 20€/mois HT · Sans engagement · Annulable à tout moment
+    </p>
+
+    <!-- Browser Mockup -->
+    <div class="browser-wrap">
+      <div class="browser-glow"></div>
+      <div class="browser">
+        <div class="browser-chrome">
+          <div class="b-dots"><span></span><span></span><span></span></div>
+          <div class="b-url">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="opacity:.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>
+            app.kube.fr/projets/maison-dupont/resultats
+          </div>
+        </div>
+        <div class="mock-app">
+          <div class="mock-sidebar">
+            <div style="font-size:11px;font-weight:700;color:#2B3F5C;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px 8px;margin-bottom:4px;">Navigation</div>
+            <div class="ms-item">
+              <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>
+              Tableau de bord
+            </div>
+            <div class="ms-item active">
+              <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 16h6M9 8h2M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Mes projets
+            </div>
+            <div class="ms-item">
+              <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Nouveau projet
+            </div>
+            <div class="ms-item">
+              <svg class="ms-icon" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/></svg>
+              Paramètres
+            </div>
+          </div>
+          <div class="mock-main">
+            <div class="mock-proj-header">
+              <div>
+                <div class="mock-proj-name">Maison Dupont — R+1 — Résultats</div>
+                <div class="mock-proj-meta">Analysé le 17 avr. 2026 · 4 pages · 12 min 48 sec</div>
+              </div>
+              <div class="mock-export-btns">
+                <div class="mock-btn mock-btn-out">📊 Excel</div>
+                <div class="mock-btn mock-btn-blue">📄 PDF</div>
+              </div>
+            </div>
+            <div class="mock-conf-row">
+              <div class="mock-conf-chip"><span class="chip-dot" style="background:#10B981;"></span><span style="color:#10B981;font-size:11px;font-weight:600;">22 certifiés</span></div>
+              <div class="mock-conf-chip"><span class="chip-dot" style="background:#F59E0B;"></span><span style="color:#F59E0B;font-size:11px;font-weight:600;">4 en révision</span></div>
+              <div class="mock-conf-chip"><span class="chip-dot" style="background:#EF4444;"></span><span style="color:#EF4444;font-size:11px;font-weight:600;">1 saisi</span></div>
+            </div>
+            <table class="mock-table">
+              <thead>
+                <tr>
+                  <th>Lot</th><th>Ouvrage</th><th>Quantité</th><th>Unité</th><th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="t-lot">Maçonnerie</td>
+                  <td class="t-name">Murs extérieurs bruts</td>
+                  <td class="t-qty">126.40</td>
+                  <td style="color:#435470;font-size:11px;">m²</td>
+                  <td><span class="conf-badge cb-auto">Validé</span></td>
+                </tr>
+                <tr>
+                  <td class="t-lot">Maçonnerie</td>
+                  <td class="t-name">Parpaings 20×20×50</td>
+                  <td class="t-qty">2 940</td>
+                  <td style="color:#435470;font-size:11px;">unité</td>
+                  <td><span class="conf-badge cb-auto">Validé</span></td>
+                </tr>
+                <tr>
+                  <td class="t-lot">Fondations</td>
+                  <td class="t-name">Béton fondation filante</td>
+                  <td class="t-qty">18.50</td>
+                  <td style="color:#435470;font-size:11px;">m³</td>
+                  <td><span class="conf-badge cb-auto">Validé</span></td>
+                </tr>
+                <tr>
+                  <td class="t-lot">Carrelage</td>
+                  <td class="t-name">Carrelage sol RDC</td>
+                  <td class="t-qty">84.20</td>
+                  <td style="color:#435470;font-size:11px;">m²</td>
+                  <td><span class="conf-badge cb-semi">Contrôlé</span></td>
+                </tr>
+                <tr>
+                  <td class="t-lot">Toiture</td>
+                  <td class="t-name">Tuiles canal 22×42</td>
+                  <td class="t-qty">1 820</td>
+                  <td style="color:#435470;font-size:11px;">unité</td>
+                  <td><span class="conf-badge cb-auto">Validé</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ TRUST BAR ═══════════════════ -->
+<div class="trust">
+  <div class="container">
+    <div class="trust-grid">
+      <div>
+        <div class="trust-val">Gratuit</div>
+        <div class="trust-lbl">pour démarrer, sans carte</div>
+      </div>
+      <div>
+        <div class="trust-val">15 min</div>
+        <div class="trust-lbl">par projet en moyenne</div>
+      </div>
+      <div>
+        <div class="trust-val">20€</div>
+        <div class="trust-lbl">/mois après l'essai</div>
+      </div>
+      <div>
+        <div class="trust-val">8 lots</div>
+        <div class="trust-lbl">couverts en version V1</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ COMMENT ÇA MARCHE ═══════════════════ -->
+<section class="section" id="comment-ca-marche">
+  <div class="container">
+    <div class="section-lbl">Comment ça marche</div>
+    <h2 class="section-title">Trois étapes. Zéro formation requise.</h2>
+    <p class="section-sub">Notre pipeline de traitement automatisé analyse votre plan de façon autonome, étape par étape, avec transparence totale sur chaque résultat.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num-box">1</div>
+        <h3>Uploadez vos plans</h3>
+        <p>Déposez votre fichier PDF ou image (scan, photo). Le système convertit automatiquement le document en haute résolution pour l'analyse.</p>
+        <span class="step-tag">PDF · PNG · JPG · TIFF</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num-box">2</div>
+        <h3>Le moteur analyse et calcule</h3>
+        <p>Le Moteur ScanMap™ détecte les cotes, identifie murs, ouvertures, toiture… et applique les formules métier. Il vous demande les données manquantes si besoin.</p>
+        <span class="step-tag">ScanMap™ · Traitement vectoriel · ~12 min</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num-box">3</div>
+        <h3>Exportez vos quantités</h3>
+        <p>Vérifiez, corrigez si nécessaire, puis exportez votre tableau de quantités complet, prêt pour le chiffrage ou la commande de matériaux.</p>
+        <span class="step-tag">Excel · PDF · CSV</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FONCTIONNALITÉS ═══════════════════ -->
+<section class="section" id="fonctionnalites" style="padding-top:0;">
+  <div class="container">
+    <div class="section-lbl">Fonctionnalités</div>
+    <h2 class="section-title">Tout ce dont le professionnel du BTP a besoin.</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>Lecture optique avancée sur plans architecturaux</h3>
+        <p>Notre Moteur ScanMap™ offre une précision documentaire inégalée pour l'extraction de données depuis vos plans techniques.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>8 lots couverts en V1</h3>
+        <p>Terrassement, fondations, maçonnerie, plâtrerie, carrelage, toiture, enduit et chape — tous les corps d'état essentiels.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Export Excel · PDF · CSV</h3>
+        <p>Téléchargement immédiat dans le format de votre choix. Fichiers structurés par lot, prêts pour intégration dans votre logiciel de chiffrage.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>Paramétrage métier personnalisé</h3>
+        <p>Configurez vos dimensions de matériaux, coefficients de perte et hauteurs standard. Sauvegardés automatiquement pour tous vos projets suivants.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3h6v4H9V3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Résultats auditables à 3 niveaux</h3>
+        <p>Chaque quantité affiche sa source et la formule appliquée. Traçabilité totale pour la validation.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Historique complet des projets</h3>
+        <p>Retrouvez, comparez et réexportez n'importe lequel de vos projets passés. Les paramètres de chaque analyse sont conservés indéfiniment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ LOTS COUVERTS ═══════════════════ -->
+<section class="section" id="lots" style="padding-top:0;">
+  <div class="container">
+    <div class="section-lbl">Lots couverts</div>
+    <h2 class="section-title">8 corps d'état pris en charge en V1.</h2>
+    <p class="section-sub">Chaque lot produit des quantités précises avec justification : surfaces, volumes, linéaires et comptages.</p>
+    <div class="lots-grid">
+      <div class="lot-card"><div class="lot-em">🏗️</div><div class="lot-name">Terrassement</div><div class="lot-desc">Volume de fouilles, emprise au sol, décapage de terre végétale</div></div>
+      <div class="lot-card"><div class="lot-em">⚙️</div><div class="lot-name">Fondations</div><div class="lot-desc">Linéaire de fondations filantes, volume béton, ferraillage estimé</div></div>
+      <div class="lot-card"><div class="lot-em">🧱</div><div class="lot-name">Maçonnerie</div><div class="lot-desc">Surface de murs, parpaings/briques, déduction des ouvertures</div></div>
+      <div class="lot-card"><div class="lot-em">🪟</div><div class="lot-name">Plâtrerie / Placo</div><div class="lot-desc">Surface de cloisons, plaques BA13, rails et montants en linéaire</div></div>
+      <div class="lot-card"><div class="lot-em">🔲</div><div class="lot-name">Carrelage</div><div class="lot-desc">Surface sol par pièce, nombre de carreaux avec coefficient de perte</div></div>
+      <div class="lot-card"><div class="lot-em">🏠</div><div class="lot-name">Toiture</div><div class="lot-desc">Surface de couverture, tuiles/ardoises, linéaire de faîtage et arêtiers</div></div>
+      <div class="lot-card"><div class="lot-em">🖌️</div><div class="lot-name">Enduit / Crépi</div><div class="lot-desc">Surface de façades extérieures avec déduction des ouvertures</div></div>
+      <div class="lot-card"><div class="lot-em">📐</div><div class="lot-name">Chape / Dalle</div><div class="lot-desc">Surface et volume de chape, épaisseur paramétrable par zone</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TARIFS ═══════════════════ -->
+<section class="section pricing-section" id="tarifs">
+  <div class="container">
+    <div class="section-lbl">Tarification</div>
+    <h2 class="section-title">Un prix. Un abonnement. Tout inclus.</h2>
+    <p class="section-sub">Pas de surprises, pas de module payant. Tout l'outil pour un forfait mensuel inférieur au coût d'une heure de métreur.</p>
+    <div class="pricing-wrap">
+      <div class="pricing-card">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue-l);margin-bottom:8px;">Abonnement Standard</div>
+        <div class="pricing-price"><sup>€</sup>20</div>
+        <div class="pricing-period">par mois · hors taxes · sans engagement</div>
+        <div class="pricing-feats">
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>~50 projets par mois inclus</span></div>
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>8 lots couverts — tous corps d'état V1</span></div>
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Export illimité — Excel, PDF, CSV</span></div>
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Paramétrage matériaux sauvegardé</span></div>
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Historique complet de tous vos projets</span></div>
+          <div class="pf-item"><div class="pf-check"><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Justification source/formule sur chaque résultat</span></div>
+        </div>
+        <a [routerLink]="['/auth/signup']" class="btn btn-primary" style="width:100%;justify-content:center;">Démarrer l'essai gratuit</a>
+        <div class="pricing-note">Essai gratuit inclus · Puis 20€/mois · Annulable à tout moment · Facture mensuelle incluse</div>
+      </div>
+      <div>
+        <div class="cost-table" style="margin-bottom:16px;">
+          <div class="cost-title">Ce qui est inclus dans votre abonnement</div>
+          <div class="cost-row"><span class="label">Projets par mois</span><span class="val">~50 projets</span></div>
+          <div class="cost-row"><span class="label">Lots couverts</span><span class="val">8 corps d'état</span></div>
+          <div class="cost-row"><span class="label">Exports</span><span class="val">Illimités</span></div>
+          <div class="cost-row"><span class="label">Paramétrage matériaux</span><span class="val">Sauvegardé</span></div>
+          <div class="cost-row highlight"><span class="label">Abonnement tout inclus</span><span class="val">20€/mois</span></div>
+        </div>
+        <div class="compare-wrap">
+          <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:14px;">Comparaison avec l'existant</div>
+          <table class="compare-table">
+            <thead><tr><th>Solution</th><th>Coût</th><th>Temps</th></tr></thead>
+            <tbody>
+              <tr><td>Métreur humain</td><td class="price-col" style="color:#EF4444;">200–500€/proj</td><td>4–8 heures</td></tr>
+              <tr><td>Logiciel classique</td><td class="price-col" style="color:var(--text-2);">50–200€/mois</td><td>1–3 heures</td></tr>
+              <tr class="our"><td>Kube ✦</td><td class="price-col" style="color:#10B981;">20€/mois</td><td style="color:#10B981;">15 min</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CTA FINAL ═══════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Votre premier métré en 15 minutes — gratuitement.</h2>
+      <p>Créez votre compte et testez Kube sans carte bancaire. Ensuite, continuez pour 20€/mois — moins qu'une heure de métreur.</p>
+      <div class="cta-actions">
+        <a [routerLink]="['/auth/signup']" class="btn btn-primary btn-lg">Démarrer l'essai gratuit</a>
+        <a [routerLink]="['/auth/login']" class="btn btn-secondary btn-lg">Se connecter</a>
+      </div>
+      <div class="cta-legal">Aucune carte bancaire requise · 20€/mois après l'essai · Support inclus</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="lp-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <a href="#" class="footer-brand">
+        <img src="logo.svg" alt="Kube" class="footer-logo">
+        Kube
+      </a>
+      <ul class="footer-links">
+        <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+        <li><a href="#tarifs">Tarifs</a></li>
+        <li><a href="#">Conditions d'utilisation</a></li>
+        <li><a href="#">Politique de confidentialité</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Kube · Tous droits réservés</div>
+    </div>
+  </div>
+</footer>

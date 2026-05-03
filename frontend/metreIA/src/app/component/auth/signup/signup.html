@@ -1,0 +1,58 @@
+<app-header></app-header>
+
+<div class="signup-container">
+    <div class="signup-form-container">
+        <h2>Créer un compte</h2>
+
+        <div class="error-banner" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="onSubmit()" #signupForm="ngForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    [(ngModel)]="email"
+                    required
+                    autocomplete="email"
+                    [disabled]="isLoading"
+                />
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    required
+                    autocomplete="new-password"
+                    [disabled]="isLoading"
+                />
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    [(ngModel)]="confirmPassword"
+                    required
+                    autocomplete="new-password"
+                    [disabled]="isLoading"
+                />
+            </div>
+            <button
+                type="submit"
+                [disabled]="isLoading || signupForm.invalid"
+            >
+                {{ isLoading ? 'Création en cours...' : 'Créer un compte' }}
+            </button>
+        </form>
+
+        <p class="login-link">Déjà un compte ? <a routerLink="/auth/login">Se connecter</a></p>
+    </div>
+</div>

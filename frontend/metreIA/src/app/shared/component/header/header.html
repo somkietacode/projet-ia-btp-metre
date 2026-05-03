@@ -1,0 +1,7 @@
+<div class="header-container">
+    <app-site-logo></app-site-logo>
+    <app-desktop-menu *ngIf="!isLoginPage && !isDashboardPage"></app-desktop-menu>
+    <app-header-cta *ngIf="!isLoginPage && !hasAValidToken"></app-header-cta>
+    <app-profile *ngIf="(hasAValidToken && planId!==null) && !isAdmin" [email]="email" [planId]="planId"></app-profile>
+    <app-profile *ngIf="isAdmin" [email]="adminEmail" [planId]="planId"></app-profile>
+</div>

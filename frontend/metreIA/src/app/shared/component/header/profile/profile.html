@@ -1,0 +1,9 @@
+<div class="profile-container">
+    <div class="profile-avatar" (click)="goTohome()" title="Accueil">
+        {{ userInitials }}
+    </div>
+    <app-badges [badge_id]="planId"></app-badges>
+    <button class="logout-btn" (click)="logout()" title="Se déconnecter">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
+</div>

@@ -1,0 +1,80 @@
+@use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+$primary-color: #313131;
+$secondary-color: #6C757D;
+$background-color: #F8F9FA;
+$text-color: #212529;
+
+:root {
+    --primary-color: #{$primary-color};
+    --secondary-color: #{$secondary-color};
+    --background-color: #{$background-color};
+    --text-color: #{$text-color};
+}
+
+
+
+
+
+
+
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.buton-primary {
+    background-color: $primary-color;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    &:hover {
+        background-color: color.adjust($primary-color, $lightness: -10%);
+    }
+}
+
+.buton-secondary {
+    background-color: $secondary-color;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    &:hover {
+        background-color: color.adjust($secondary-color, $lightness: -10%);
+    }
+}           
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    &:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+}

@@ -1,0 +1,5 @@
+<div class="profile-badge" [ngClass]="'badge-' + badge_id">
+    <span class="badge-text">
+        {{ badge_id === 1 ? 'Basic' : badge_id === 2 ? 'Pro' : badge_id === 999 ? 'Super Admin' : 'Enterprise' }}
+    </span>
+</div>

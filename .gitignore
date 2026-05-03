@@ -1,2 +1,11 @@
 Knowledge_Base_Temp
 .vscode
+backend/src/.env
+backend/src/.venv
+backend/src/__pycache__
+backend/src/lib/__pycache__
+backend/src/lib/core/__pycache__
+backend/src/lib/model/__pycache__
+backend/src/postgres_data
+backend/src/qdrant_storage
+prompt

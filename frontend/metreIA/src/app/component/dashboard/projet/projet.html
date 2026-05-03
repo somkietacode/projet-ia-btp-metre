@@ -1,0 +1,68 @@
+<div class="projet-content">
+  <!-- En-tête -->
+  <div class="page-header">
+    <h1 class="page-title">Mes projets</h1>
+    <button class="buton-primary" (click)="goToNewProject()">
+      <i class="fa fa-plus"></i> Nouveau projet
+    </button>
+  </div>
+
+  <!-- Chargement -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fa-solid fa-spinner fa-spin"></i> Chargement…
+  </div>
+
+  <!-- Erreur -->
+  <div class="error-banner" *ngIf="errorMessage">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Liste vide -->
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && projects.length === 0">
+    <i class="fa-solid fa-folder-open"></i>
+    <p>Aucun projet pour l'instant.</p>
+    <button class="buton-primary" (click)="goToNewProject()">Créer mon premier projet</button>
+  </div>
+
+  <!-- Grille de projets -->
+  <div class="projects-grid" *ngIf="!isLoading && projects.length > 0">
+    <div class="project-card" *ngFor="let project of projects" (click)="openProject(project.id)">
+      <!-- Badge statut -->
+      <span class="status-badge" [ngClass]="getStatusClass(project.status)">
+        {{ getStatusLabel(project.status) }}
+      </span>
+
+      <!-- Titre + description -->
+      <h2 class="project-name">{{ project.name }}</h2>
+      <p class="project-desc" *ngIf="project.description">{{ project.description }}</p>
+
+      <!-- Méta : étape en cours -->
+      <p class="project-step" *ngIf="project.current_step">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> {{ project.current_step }}
+      </p>
+
+      <!-- Stats -->
+      <div class="project-stats">
+        <span><i class="fa-solid fa-layer-group"></i> {{ project.ouvrages_count }} ouvrage(s)</span>
+        <span><i class="fa-solid fa-cubes"></i> {{ project.materials_count }} matériau(x)</span>
+        <span><i class="fa-solid fa-map"></i> {{ project.plans_count }} plan(s)</span>
+        <span
+          class="pending-badge"
+          *ngIf="project.questions_pending_count > 0"
+        ><i class="fa-solid fa-circle-question"></i> {{ project.questions_pending_count }} question(s)</span>
+      </div>
+
+      <!-- Pied de carte -->
+      <div class="project-footer">
+        <span class="project-date">Modifié {{ formatDate(project.last_updated) }}</span>
+        <button
+          class="btn-danger-sm"
+          (click)="$event.stopPropagation(); confirmDelete(project)"
+          [disabled]="deletingId === project.id"
+        >
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

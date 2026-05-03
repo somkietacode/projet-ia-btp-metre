@@ -1,0 +1,41 @@
+<div class="tableau-de-bord-content">
+    <div class="page-header">
+        <h1 class="page-title">Tableau de bord</h1>
+        <button class="buton-primary"><i class="fa fa-plus"></i> Nouveau Projet</button>
+    </div>
+
+    <div class="stats-grid" *ngIf="!isLoading">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e8f0fe"><i class="fa-solid fa-bolt" style="color:#1e3a5f"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ user_quota_used }}</span>
+                <span class="stat-label">Quota utilisé</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#d1fae5"><i class="fa-solid fa-circle-check" style="color:#059669"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ quotaRemaining }}</span>
+                <span class="stat-label">Quota restant</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fef3c7"><i class="fa-solid fa-layer-group" style="color:#d97706"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ user_plan_quota }}</span>
+                <span class="stat-label">Quota total</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="quota-card" *ngIf="!isLoading">
+        <div class="quota-header">
+            <span>Consommation du quota</span>
+            <span class="quota-percent" [class.danger]="quotaPercent >= 90" [class.warning]="quotaPercent >= 70 && quotaPercent < 90">{{ quotaPercent }}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" [style.width]="quotaPercent + '%'" [class.danger]="quotaPercent >= 90" [class.warning]="quotaPercent >= 70 && quotaPercent < 90"></div>
+        </div>
+        <div class="quota-legend">{{ user_quota_used }} / {{ user_plan_quota }} utilisés</div>
+    </div>
+</div>

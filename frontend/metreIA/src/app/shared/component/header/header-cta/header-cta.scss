@@ -1,0 +1,16 @@
+@media screen and (min-width:700px) {
+    .header-cta-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: flex-end;
+    }
+}
+
+@media screen and (max-width:700px) {
+    .header-cta-container {
+        display: none;
+    }
+}
+
+

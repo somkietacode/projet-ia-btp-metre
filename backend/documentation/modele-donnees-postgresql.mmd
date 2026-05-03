@@ -1,44 +1,102 @@
 erDiagram
-    USERS ||--o{ PROJECTS : possède
-    USERS ||--o{ MATERIAL_PARAMS : configure
+    PLANS ||--o{ USERS : souscrit
+    PLANS {
+        int id PK
+        string name
+        string description
+        int quota
+        float price
+    }
+
+    USERS ||--o{ DOCUMENTS : possede
+    USERS ||--o{ PROJECTS : possede
     USERS {
-        uuid id PK
+        int id PK
+        string username
         string email
         string password_hash
-        int token_quota
-        int tokens_used
-        date subscription_end
+        int plan_id FK
+        int quota_used
     }
-    PROJECTS ||--o{ PLANS : contient
-    PROJECTS ||--o{ CALCULATION_RESULTS : produit
+
+    DOCUMENTS {
+        int id PK
+        int user_id FK
+        string filename
+        bytes content
+        string text_content
+        string upload_date
+        string extension
+    }
+
+    PUBLIC_DOCUMENTS {
+        int id PK
+        string filename
+        bytes content
+        string text_content
+        string upload_date
+        string extension
+    }
+
+    PROJECTS ||--o{ PLANS_BATIMENT : contient
+    PROJECTS ||--o{ MATERIALS : contient
+    PROJECTS ||--o{ OUVRAGES : contient
     PROJECTS {
-        uuid id PK
-        uuid user_id FK
+        int id PK
+        int user_id FK
         string name
-        timestamp created_at
+        string description
+        string creation_date
+        string status "pending|vision_running|waiting_user|calcul_running|done|error"
+        string current_step
+        string error_message
+        string last_updated
     }
-    PLANS {
-        uuid id PK
-        uuid project_id FK
-        string type "architecte|masse|toiture|interieur"
-        string file_url
-        jsonb extracted_data
+
+    PLANS_BATIMENT {
+        int id PK
+        string name
+        string description
+        bytes content
+        string upload_date
+        string extension
+        int project_id FK
     }
-    MATERIAL_PARAMS {
-        uuid id PK
-        uuid user_id FK
-        string category "maconnerie|placo|toiture|fondation..."
-        string param_key
-        float param_value
-        string unit
+
+    MATERIALS {
+        int id PK
+        string name
+        string description
+        string unite_defaut
+        int project_id FK
     }
-    CALCULATION_RESULTS {
-        uuid id PK
-        uuid project_id FK
-        string lot "terrassement|fondation|maconnerie..."
-        string ouvrage
+
+    OUVRAGES ||--o{ LIGNES_DE_CALCUL : contient
+    OUVRAGES ||--o{ NOTES_DE_CALCUL : contient
+    OUVRAGES {
+        int id PK
+        string name
+        string categorie "gros_oeuvre|second_oeuvre"
+        string description
+        int position
+        int project_id FK
+    }
+
+    LIGNES_DE_CALCUL }o--|| MATERIALS : utilise
+    LIGNES_DE_CALCUL {
+        int id PK
+        int ouvrage_id FK
+        int material_id FK
+        string description
         float quantity
         string unit
-        string source "auto|deduit|manuel"
-        jsonb justification
+        int position
+    }
+
+    NOTES_DE_CALCUL {
+        int id PK
+        string title
+        string contenu
+        int ouvrage_id FK
+        string calculation_date
     }

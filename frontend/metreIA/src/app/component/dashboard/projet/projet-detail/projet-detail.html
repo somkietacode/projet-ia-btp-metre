@@ -1,0 +1,321 @@
+<div class="projet-detail-content" *ngIf="!isLoading && project">
+
+  <!-- ─── En-tête ─────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Retour
+    </button>
+    <div class="header-info">
+      <h1 class="page-title">{{ project.name }}</h1>
+      <p class="project-desc" *ngIf="project.description">{{ project.description }}</p>
+    </div>
+    <div class="header-actions">
+      <span class="status-badge" [ngClass]="getStatusClass(project.status)">
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="isProcessing(project.status)"></i>
+        {{ getStatusLabel(project.status) }}
+      </span>
+      <button
+        *ngIf="canRunWorkflow()"
+        class="btn-run"
+        (click)="runWorkflow()"
+        [disabled]="isRunningWorkflow"
+        title="Lancer ou relancer l'analyse des plans"
+      >
+        <i class="fa-solid fa-play" *ngIf="!isRunningWorkflow"></i>
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="isRunningWorkflow"></i>
+        Lancer l'analyse
+      </button>
+      <button
+        class="btn-export"
+        (click)="exportResults()"
+        [disabled]="project.ouvrages.length === 0"
+        title="Exporter les résultats en CSV"
+      >
+        <i class="fa-solid fa-file-csv"></i> Exporter
+      </button>
+    </div>
+  </div>
+
+  <!-- Étape en cours -->
+  <div class="step-banner" *ngIf="project.current_step">
+    <i class="fa-solid fa-circle-notch fa-spin"></i>
+    <span>{{ project.current_step }}</span>
+  </div>
+
+  <!-- Quota tokens en temps réel -->
+  <div class="quota-banner" *ngIf="liveQuotaUsed !== null && livePlanQuota !== null">
+    <i class="fa-solid fa-coins"></i>
+    Tokens utilisés : <strong>{{ liveQuotaUsed | number }}</strong> / {{ livePlanQuota | number }}
+    <span class="quota-bar">
+      <span class="quota-fill" [style.width.%]="(liveQuotaUsed / livePlanQuota) * 100 | number:'1.0-0'"></span>
+    </span>
+  </div>
+
+  <!-- Message d'erreur projet -->
+  <div class="error-banner project-error" *ngIf="project.status === 'error' && project.error_message">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ project.error_message }}
+  </div>
+
+  <!-- ─── Résumé ────────────────────────────────────────────────────────────  -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>{{ project.ouvrages_count }} ouvrage(s)</span>
+    </div>
+    <div class="stat-item">
+      <i class="fa-solid fa-cubes"></i>
+      <span>{{ project.materials_count }} matériau(x)</span>
+    </div>
+    <div class="stat-item">
+      <i class="fa-solid fa-map"></i>
+      <span>{{ project.plans_count }} plan(s)</span>
+    </div>
+    <div class="stat-item" [class.highlight]="project.questions_pending_count > 0">
+      <i class="fa-solid fa-circle-question"></i>
+      <span>{{ project.questions_pending_count }} question(s) en attente</span>
+    </div>
+    <span class="stat-date">Mis à jour {{ formatDate(project.last_updated) }}</span>
+  </div>
+
+  <!-- ─── Onglets ──────────────────────────────────────────────────────────── -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'overview'" (click)="setTab('overview')">
+      <i class="fa-solid fa-chart-simple"></i> Vue d'ensemble
+    </button>
+    <button [class.active]="activeTab === 'questions'" (click)="setTab('questions')">
+      <i class="fa-solid fa-circle-question"></i>
+      Questions
+      <span class="badge" *ngIf="pendingQuestions.length > 0">{{ pendingQuestions.length }}</span>
+    </button>
+    <button [class.active]="activeTab === 'ouvrages'" (click)="setTab('ouvrages')">
+      <i class="fa-solid fa-layer-group"></i> Ouvrages & calculs
+    </button>
+    <button [class.active]="activeTab === 'plans'" (click)="setTab('plans')">
+      <i class="fa-solid fa-map"></i> Plans de bâtiment
+    </button>
+  </div>
+
+  <!-- ══════════════ Onglet : Vue d'ensemble ══════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'overview'">
+
+    <!-- Tableau récap matériaux -->
+    <div class="section-card" *ngIf="totalQuantityByMaterial().length > 0">
+      <h2 class="section-title">
+        <i class="fa-solid fa-cubes"></i> Récapitulatif des matériaux
+      </h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Matériau</th>
+            <th class="text-right">Quantité totale</th>
+            <th>Unité</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of totalQuantityByMaterial()">
+            <td>{{ row.name }}</td>
+            <td class="text-right font-mono">{{ row.total }}</td>
+            <td class="text-muted">{{ row.unite }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="totalQuantityByMaterial().length === 0">
+      <i class="fa-solid fa-hourglass-half"></i>
+      <p>Les résultats de calcul apparaîtront ici une fois le projet traité.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ Onglet : Questions ══════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'questions'">
+
+    <!-- Questions en attente -->
+    <div class="section-card" *ngIf="pendingQuestions.length > 0">
+      <h2 class="section-title pending-title">
+        <i class="fa-solid fa-circle-question"></i> Questions en attente ({{ pendingQuestions.length }})
+      </h2>
+
+      <div class="question-item" *ngFor="let q of pendingQuestions">
+        <div class="question-meta">
+          <span class="question-ouvrage" *ngIf="q.ouvrage_name">{{ q.ouvrage_name }}</span>
+          <span class="question-date">{{ formatDate(q.asked_date) }}</span>
+        </div>
+        <p class="question-text">{{ q.question_text }}</p>
+
+        <div class="answer-form" *ngIf="answeringId === q.id">
+          <textarea
+            class="answer-input"
+            [(ngModel)]="answerDraft"
+            placeholder="Votre réponse…"
+            rows="3"
+          ></textarea>
+          <div class="error-banner sm" *ngIf="answerError">{{ answerError }}</div>
+          <div class="answer-actions">
+            <button class="btn-outline-sm" (click)="cancelAnswer()">Annuler</button>
+            <button
+              class="buton-primary sm"
+              (click)="submitAnswer(q)"
+              [disabled]="!answerDraft.trim() || isSubmittingAnswer"
+            >
+              <i class="fa-solid fa-spinner fa-spin" *ngIf="isSubmittingAnswer"></i>
+              Envoyer
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="btn-answer"
+          *ngIf="answeringId !== q.id"
+          (click)="openAnswer(q)"
+        >
+          <i class="fa-solid fa-reply"></i> Répondre
+        </button>
+      </div>
+    </div>
+
+    <!-- Questions répondues -->
+    <div class="section-card" *ngIf="answeredQuestions.length > 0">
+      <h2 class="section-title answered-title">
+        <i class="fa-solid fa-circle-check"></i> Réponses données ({{ answeredQuestions.length }})
+      </h2>
+      <div class="question-item answered" *ngFor="let q of answeredQuestions">
+        <div class="question-meta">
+          <span class="question-ouvrage" *ngIf="q.ouvrage_name">{{ q.ouvrage_name }}</span>
+          <span class="question-date">{{ formatDate(q.asked_date) }}</span>
+        </div>
+        <p class="question-text">{{ q.question_text }}</p>
+        <div class="answer-bubble">
+          <i class="fa-solid fa-user"></i>
+          <span>{{ q.answer_text }}</span>
+          <span class="answer-date">{{ formatDate(q.answered_date!) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="project.questions.length === 0">
+      <i class="fa-solid fa-check-circle"></i>
+      <p>Aucune question pour l'instant.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ Onglet : Ouvrages & calculs ══════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'ouvrages'">
+    <div *ngIf="project.ouvrages.length > 0">
+      <div class="section-card" *ngFor="let ouvrage of project.ouvrages">
+        <div class="ouvrage-header">
+          <div>
+            <h2 class="ouvrage-title">{{ ouvrage.name }}</h2>
+            <span class="ouvrage-cat">{{ ouvrage.categorie }}</span>
+            <p class="ouvrage-desc" *ngIf="ouvrage.description">{{ ouvrage.description }}</p>
+          </div>
+        </div>
+
+        <table class="data-table" *ngIf="ouvrage.lignes_de_calcul.length > 0">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Matériau</th>
+              <th class="text-right">Quantité</th>
+              <th>Unité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ligne of ouvrage.lignes_de_calcul">
+              <td>{{ ligne.description }}</td>
+              <td class="text-muted">{{ ligne.material.name }}</td>
+              <td class="text-right font-mono">{{ ligne.quantity }}</td>
+              <td class="text-muted">{{ ligne.unit }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="empty-hint" *ngIf="ouvrage.lignes_de_calcul.length === 0">
+          Aucune ligne de calcul pour cet ouvrage.
+        </p>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="project.ouvrages.length === 0">
+      <i class="fa-solid fa-hourglass-half"></i>
+      <p>Les ouvrages apparaîtront ici après le traitement du projet.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ Onglet : Plans de bâtiment ══════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'plans'">
+
+    <!-- Zone d'upload -->
+    <div class="section-card upload-card">
+      <h2 class="section-title">
+        <i class="fa-solid fa-upload"></i> Ajouter un plan
+      </h2>
+
+      <div class="upload-row">
+        <input
+          type="file"
+          id="planFile"
+          class="file-input"
+          (change)="onPlanFileSelected($event)"
+          accept=".pdf,.png,.jpg,.jpeg,.dwg,.dxf"
+        />
+        <label for="planFile" class="file-label">
+          <i class="fa-solid fa-paperclip"></i>
+          {{ selectedPlanFile ? selectedPlanFile.name : 'Choisir un fichier…' }}
+        </label>
+        <input
+          type="text"
+          class="input plan-name-input"
+          [(ngModel)]="planName"
+          placeholder="Nom du plan (optionnel)"
+        />
+        <button
+          class="buton-primary sm"
+          (click)="uploadPlan()"
+          [disabled]="!selectedPlanFile || isUploadingPlan"
+        >
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="isUploadingPlan"></i>
+          <i class="fa-solid fa-upload" *ngIf="!isUploadingPlan"></i>
+          Ajouter
+        </button>
+      </div>
+
+      <div class="error-banner sm" *ngIf="uploadPlanError">{{ uploadPlanError }}</div>
+      <div class="success-banner sm" *ngIf="uploadPlanSuccess">{{ uploadPlanSuccess }}</div>
+    </div>
+
+    <!-- Liste des plans -->
+    <div class="section-card" *ngIf="project.plans_batiment.length > 0">
+      <div class="plan-item" *ngFor="let plan of project.plans_batiment">
+        <div class="plan-info">
+          <i class="fa-solid fa-file-pdf" *ngIf="plan.extension === '.pdf'"></i>
+          <i class="fa-solid fa-file-image" *ngIf="plan.extension !== '.pdf'"></i>
+          <div>
+            <p class="plan-name">{{ plan.name }}</p>
+            <p class="plan-meta">{{ plan.extension.toUpperCase() }} · {{ formatDate(plan.upload_date) }}</p>
+          </div>
+        </div>
+        <button class="btn-danger-sm" (click)="deletePlan(plan)" title="Supprimer">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="project.plans_batiment.length === 0">
+      <i class="fa-solid fa-map"></i>
+      <p>Aucun plan de bâtiment pour l'instant.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Chargement -->
+<div class="loading-state" *ngIf="isLoading">
+  <i class="fa-solid fa-spinner fa-spin"></i> Chargement du projet…
+</div>
+
+<!-- Erreur principale -->
+<div class="error-full" *ngIf="!isLoading && errorMessage">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  <p>{{ errorMessage }}</p>
+  <button class="btn-outline" (click)="goBack()">Retour à mes projets</button>
+</div>

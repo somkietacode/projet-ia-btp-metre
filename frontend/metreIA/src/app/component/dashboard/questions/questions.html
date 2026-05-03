@@ -1,0 +1,115 @@
+<div class="questions-page">
+
+    <!-- En-tête -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fa-solid fa-circle-question"></i>
+                Questions
+            </h1>
+            <p class="page-subtitle">Le système vous pose des questions pour affiner les calculs de vos projets.</p>
+        </div>
+        <div class="badge-pending" *ngIf="pendingCount > 0">
+            {{ pendingCount }} en attente
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filter-bar">
+        <button class="filter-btn" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+            Toutes
+        </button>
+        <button class="filter-btn" [class.active]="activeFilter === 'pending'" (click)="setFilter('pending')">
+            <i class="fa-solid fa-clock"></i> En attente
+        </button>
+        <button class="filter-btn" [class.active]="activeFilter === 'answered'" (click)="setFilter('answered')">
+            <i class="fa-solid fa-check"></i> Répondues
+        </button>
+    </div>
+
+    <!-- Chargement -->
+    <div class="loading-state" *ngIf="isLoading">
+        <i class="fa-solid fa-spinner fa-spin"></i> Chargement…
+    </div>
+
+    <!-- Erreur -->
+    <div class="error-banner" *ngIf="errorMessage && !isLoading">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+    </div>
+
+    <!-- Liste vide -->
+    <div class="empty-state" *ngIf="!isLoading && !errorMessage && questions.length === 0">
+        <i class="fa-regular fa-circle-check"></i>
+        <p>Aucune question pour le moment.</p>
+    </div>
+
+    <!-- Liste des questions -->
+    <div class="questions-list" *ngIf="!isLoading && questions.length > 0">
+        <div class="question-card" *ngFor="let q of questions" [class.pending]="q.status === 'pending'" [class.answered]="q.status === 'answered'">
+
+            <!-- Contexte -->
+            <div class="question-context">
+                <span class="context-badge project">
+                    <i class="fa-solid fa-diagram-project"></i> {{ q.project_name }}
+                </span>
+                <span class="context-badge ouvrage" *ngIf="q.ouvrage_name">
+                    <i class="fa-solid fa-layer-group"></i> {{ q.ouvrage_name }}
+                </span>
+                <span class="status-badge" [class.pending]="q.status === 'pending'" [class.answered]="q.status === 'answered'">
+                    <i class="fa-solid fa-clock" *ngIf="q.status === 'pending'"></i>
+                    <i class="fa-solid fa-check" *ngIf="q.status === 'answered'"></i>
+                    {{ q.status === 'pending' ? 'En attente' : 'Répondue' }}
+                </span>
+            </div>
+
+            <!-- Corps -->
+            <div class="question-body">
+                <div class="question-avatar">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="question-bubble">
+                    <p class="question-text">{{ q.question_text }}</p>
+                    <span class="question-date">{{ formatDate(q.asked_date) }}</span>
+                </div>
+            </div>
+
+            <!-- Réponse déjà donnée -->
+            <div class="answer-body" *ngIf="q.status === 'answered'">
+                <div class="answer-bubble">
+                    <p class="answer-text">{{ q.answer_text }}</p>
+                    <span class="answer-date">Répondu le {{ formatDate(q.answered_date!) }}</span>
+                </div>
+                <div class="answer-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+
+            <!-- Zone de saisie de réponse -->
+            <div class="answer-input-area" *ngIf="q.status === 'pending'">
+                <div *ngIf="answeringId !== q.id">
+                    <button class="btn-answer" (click)="openAnswer(q)">
+                        <i class="fa-solid fa-reply"></i> Répondre
+                    </button>
+                </div>
+                <div class="answer-form" *ngIf="answeringId === q.id">
+                    <textarea
+                        class="answer-textarea"
+                        [(ngModel)]="answerDraft"
+                        placeholder="Votre réponse…"
+                        rows="3">
+                    </textarea>
+                    <div class="answer-form-error" *ngIf="submitError">{{ submitError }}</div>
+                    <div class="answer-form-actions">
+                        <button class="btn-cancel" (click)="cancelAnswer()" [disabled]="isSubmitting">Annuler</button>
+                        <button class="btn-submit" (click)="submitAnswer(q)" [disabled]="isSubmitting || !answerDraft.trim()">
+                            <i class="fa-solid fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+                            <span *ngIf="!isSubmitting">Envoyer</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

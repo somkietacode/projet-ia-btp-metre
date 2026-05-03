@@ -1,0 +1,267 @@
+<div class="kb-content">
+
+    <!-- En-tête -->
+    <div class="page-header">
+        <h1 class="page-title">
+            Base documentaire publique
+            <span class="count-badge" *ngIf="!isLoading">{{ docs.length }}</span>
+        </h1>
+    </div>
+
+    <!-- Messages globaux -->
+    <div class="error-banner" *ngIf="errorMessage">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+    </div>
+
+    <!-- ─── Zone d'upload ──────────────────────────────────────────────── -->
+    <div class="upload-card">
+        <h2 class="upload-title"><i class="fa-solid fa-cloud-arrow-up"></i> Ajouter un document</h2>
+        <p class="upload-hint">
+            Formats acceptés : PDF, DOCX, XLSX, PPTX, CSV, MP4, MP3, WAV, M4A
+        </p>
+
+        <div class="upload-row">
+            <label class="file-label">
+                <i class="fa-solid fa-paperclip"></i>
+                {{ selectedFile ? selectedFile.name : 'Choisir un fichier…' }}
+                <input type="file" hidden (change)="onFileSelected($event)"
+                    accept=".pdf,.docx,.xlsx,.xls,.pptx,.csv,.mp4,.mp3,.wav,.m4a" />
+            </label>
+            <button class="btn-upload" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
+                <i class="fa-solid fa-circle-notch fa-spin" *ngIf="isUploading"></i>
+                <i class="fa-solid fa-upload" *ngIf="!isUploading"></i>
+                {{ isUploading ? 'Upload en cours…' : 'Ajouter' }}
+            </button>
+        </div>
+
+        <div class="upload-success" *ngIf="uploadSuccess">
+            <i class="fa-solid fa-circle-check"></i> {{ uploadSuccess }}
+        </div>
+        <div class="upload-error" *ngIf="uploadError">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ uploadError }}
+        </div>
+    </div>
+
+    <!-- ─── Recherche vectorielle ──────────────────────────────────────── -->
+    <div class="search-card">
+        <h2 class="search-title">
+            <i class="fa-solid fa-magnifying-glass"></i> Tester la recherche sémantique
+        </h2>
+        <p class="search-hint">Tapez une question ou des mots-clés — les passages les plus pertinents seront retournés depuis Qdrant.</p>
+
+        <div class="search-row">
+            <input
+                class="search-input"
+                type="text"
+                placeholder="Ex : charges structurelles béton armé…"
+                [(ngModel)]="searchQuery"
+                (keydown.enter)="runSearch()"
+            />
+            <label class="topk-label">Top
+                <select class="topk-select" [(ngModel)]="searchTopK">
+                    <option [ngValue]="3">3</option>
+                    <option [ngValue]="5">5</option>
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="20">20</option>
+                </select>
+            </label>
+            <button class="btn-search" [disabled]="!searchQuery.trim() || isSearching" (click)="runSearch()">
+                <i class="fa-solid fa-circle-notch fa-spin" *ngIf="isSearching"></i>
+                <i class="fa-solid fa-magnifying-glass" *ngIf="!isSearching"></i>
+                {{ isSearching ? 'Recherche…' : 'Rechercher' }}
+            </button>
+        </div>
+
+        <div class="search-error" *ngIf="searchError">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ searchError }}
+        </div>
+
+        <!-- Résultats -->
+        <ng-container *ngIf="searchResults">
+            <p class="search-count">
+                <strong>{{ searchResults.total_results }}</strong> résultat{{ searchResults.total_results !== 1 ? 's' : '' }}
+                pour <em>« {{ searchResults.query }} »</em>
+            </p>
+
+            <div class="result-list" *ngIf="searchResults.total_results > 0; else noResults">
+                <div class="result-card" *ngFor="let r of searchResults.results; let i = index">
+                    <div class="result-header">
+                        <span class="result-rank">#{{ i + 1 }}</span>
+                        <span class="score-badge" [ngClass]="scoreClass(r.score)">
+                            <i class="fa-solid fa-chart-simple"></i> {{ scorePercent(r.score) }}
+                        </span>
+                        <span class="result-filename">
+                            <i class="fa-solid fa-file-lines"></i> {{ r.document.filename }}
+                        </span>
+                        <span class="result-chunk-pos">chunk {{ r.chunk_index + 1 }}/{{ r.total_chunks }}</span>
+                    </div>
+
+                    <p class="result-description">{{ r.description }}</p>
+
+                    <div class="result-keywords" *ngIf="r.keywords.length > 0">
+                        <span class="kw-badge" *ngFor="let kw of r.keywords">{{ kw }}</span>
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="btn-view-chunk" (click)="openChunk(r)">
+                            <i class="fa-solid fa-eye"></i> Voir le passage
+                        </button>
+                        <button class="btn-view-doc" (click)="openPreview(r.document)" [disabled]="r.document.indexation_status !== 'indexed'">
+                            <i class="fa-solid fa-book-open"></i> Document complet
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #noResults>
+                <p class="empty-state"><i class="fa-solid fa-circle-info"></i> Aucun résultat trouvé pour cette requête.</p>
+            </ng-template>
+        </ng-container>
+    </div>
+
+    <!-- ─── État de chargement ───────────────────────────────── -->
+    <div class="loading-state" *ngIf="isLoading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Chargement...
+    </div>
+
+    <!-- ─── Tableau des documents ─────────────────────────────────────── -->
+    <ng-container *ngIf="!isLoading">
+        <div class="section-card">
+            <table class="docs-table" *ngIf="docs.length > 0; else empty">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fichier</th>
+                        <th>Extension</th>
+                        <th>Date d'ajout</th>
+                        <th>Statut d'indexation</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let doc of docs">
+                        <td class="id-cell">{{ doc.id }}</td>
+                        <td class="filename-cell">
+                            <i class="fa-solid fa-file-lines file-icon"></i>
+                            {{ doc.filename }}
+                        </td>
+                        <td><span class="ext-badge">{{ doc.extension }}</span></td>
+                        <td class="date-cell">{{ formatDate(doc.upload_date) }}</td>
+                        <td>
+                            <span class="status-badge" [ngClass]="getStatusClass(doc.indexation_status)">
+                                {{ getStatusLabel(doc.indexation_status) }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <!-- Prévisualisation du texte (uniquement si indexé) -->
+                            <button class="action-btn preview-btn"
+                                    [disabled]="doc.indexation_status !== 'indexed'"
+                                    [title]="doc.indexation_status === 'indexed' ? 'Voir le contenu indexé' : 'Aucun texte disponible'"
+                                    (click)="openPreview(doc)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <!-- Téléchargement du fichier original -->
+                            <button class="action-btn download-btn" title="Télécharger le fichier original"
+                                    (click)="downloadDoc(doc)">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                            <!-- Suppression -->
+                            <button class="action-btn delete-btn" title="Supprimer"
+                                    (click)="deleteDoc(doc)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ng-template #empty>
+                <p class="empty-state">
+                    <i class="fa-solid fa-folder-open"></i>
+                    Aucun document dans la base documentaire.
+                </p>
+            </ng-template>
+        </div>
+    </ng-container>
+
+</div>
+
+<!-- ─── Modale de prévisualisation ───────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="isLoadingPreview || previewDoc" (click)="closePreview()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+
+        <div class="modal-loading" *ngIf="isLoadingPreview">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Chargement du contenu…
+        </div>
+
+        <ng-container *ngIf="previewDoc && !isLoadingPreview">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-file-lines"></i>
+                    {{ previewDoc.filename }}
+                </div>
+                <button class="modal-close" (click)="closePreview()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-meta">
+                <span class="status-badge" [ngClass]="getStatusClass(previewDoc.indexation_status)">
+                    {{ getStatusLabel(previewDoc.indexation_status) }}
+                </span>
+                <span class="ext-badge">{{ previewDoc.extension }}</span>
+                <span class="date-cell">{{ formatDate(previewDoc.upload_date) }}</span>
+            </div>
+            <div class="modal-body">
+                <pre class="text-content">{{ previewDoc.text_content }}</pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-download" (click)="downloadDoc(previewDoc)">
+                    <i class="fa-solid fa-download"></i> Télécharger le fichier
+                </button>
+                <button class="btn-close" (click)="closePreview()">Fermer</button>
+            </div>
+        </ng-container>
+
+    </div>
+</div>
+
+<!-- ─── Modale détail chunk (résultat de recherche) ──────────────────────── -->
+<div class="modal-overlay" *ngIf="activeChunk" (click)="closeChunk()">
+    <div class="modal-box chunk-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fa-solid fa-paragraph"></i>
+                Passage — {{ activeChunk!.document.filename }}
+                <small class="chunk-pos-title">chunk {{ activeChunk!.chunk_index + 1 }}/{{ activeChunk!.total_chunks }}</small>
+            </div>
+            <button class="modal-close" (click)="closeChunk()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-meta">
+            <span class="score-badge" [ngClass]="scoreClass(activeChunk!.score)">
+                <i class="fa-solid fa-chart-simple"></i> {{ scorePercent(activeChunk!.score) }}
+            </span>
+            <span class="ext-badge">{{ activeChunk!.document.extension }}</span>
+            <span class="status-badge" [ngClass]="getStatusClass(activeChunk!.document.indexation_status)">
+                {{ getStatusLabel(activeChunk!.document.indexation_status) }}
+            </span>
+        </div>
+
+        <div class="chunk-keywords" *ngIf="activeChunk!.keywords.length > 0">
+            <span class="kw-label"><i class="fa-solid fa-tags"></i> Mots-clés :</span>
+            <span class="kw-badge" *ngFor="let kw of activeChunk!.keywords">{{ kw }}</span>
+        </div>
+
+        <div class="modal-body">
+            <pre class="text-content">{{ activeChunk!.chunk }}</pre>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-download" (click)="downloadDoc(activeChunk!.document)">
+                <i class="fa-solid fa-download"></i> Télécharger le fichier source
+            </button>
+            <button class="btn-close" (click)="closeChunk()">Fermer</button>
+        </div>
+    </div>
+</div>

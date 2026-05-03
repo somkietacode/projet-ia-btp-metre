@@ -1,0 +1,167 @@
+:host {
+  flex: 1;
+  display: flex;
+}
+
+.projet-content {
+  flex: 1;
+  background-color: rgb(246, 246, 246);
+  padding: 30px;
+  overflow-y: auto;
+
+  // ─── En-tête ────────────────────────────────────────────────────────────────
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin: 0;
+    }
+  }
+
+  // ─── États vide / chargement ─────────────────────────────────────────────────
+
+  .loading-state {
+    text-align: center;
+    padding: 60px;
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .error-banner {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 80px 20px;
+    color: #9ca3af;
+
+    i { font-size: 3rem; }
+    p { font-size: 1rem; margin: 0; }
+  }
+
+  // ─── Grille de projets ───────────────────────────────────────────────────────
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .project-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s, transform 0.1s;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .project-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #111827;
+      margin: 0;
+    }
+
+    .project-desc {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .project-step {
+      font-size: 0.82rem;
+      color: #4f46e5;
+      margin: 0;
+    }
+
+    .project-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: #374151;
+
+      span { display: flex; align-items: center; gap: 5px; }
+
+      .pending-badge {
+        color: #d97706;
+        font-weight: 600;
+      }
+    }
+
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid #f3f4f6;
+
+      .project-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+      }
+    }
+  }
+
+  // ─── Badges statut ───────────────────────────────────────────────────────────
+
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    align-self: flex-start;
+  }
+
+  .status-pending    { background: #f3f4f6; color: #6b7280; }
+  .status-running    { background: #ede9fe; color: #4f46e5; }
+  .status-waiting    { background: #fef3c7; color: #d97706; }
+  .status-done       { background: #d1fae5; color: #059669; }
+  .status-error      { background: #fee2e2; color: #dc2626; }
+
+  // ─── Bouton suppression ───────────────────────────────────────────────────────
+
+  .btn-danger-sm {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: background 0.15s;
+
+    &:hover { background: #fee2e2; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}

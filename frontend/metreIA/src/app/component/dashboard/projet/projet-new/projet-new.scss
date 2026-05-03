@@ -1,0 +1,632 @@
+:host {
+  flex: 1;
+  display: flex;
+}
+
+.projet-new-content {
+  flex: 1;
+  background-color: rgb(246, 246, 246);
+  padding: 30px;
+  overflow-y: auto;
+
+  // ─── En-tête ──────────────────────────────────────────────────────────────
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: #4b5563;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+
+      &:hover { background: #e5e7eb; }
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin: 0;
+    }
+  }
+
+  // ─── Stepper ──────────────────────────────────────────────────────────────
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+    max-width: 480px;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #9ca3af;
+      border: 2px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #9ca3af;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+
+    &.active {
+      .step-circle {
+        background: #1e3a5f;
+        border-color: #1e3a5f;
+        color: #fff;
+      }
+      .step-label { color: #1e3a5f; }
+    }
+
+    &.done {
+      .step-circle {
+        background: #d1fae5;
+        border-color: #6ee7b7;
+        color: #059669;
+      }
+      .step-label { color: #059669; }
+    }
+  }
+
+  .step-connector {
+    flex: 1;
+    height: 2px;
+    background: #e5e7eb;
+    margin: 0 8px;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+
+    &.done { background: #6ee7b7; }
+  }
+
+  // ─── Erreur ───────────────────────────────────────────────────────────────
+
+  .error-banner {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+
+  // ─── Carte générique ──────────────────────────────────────────────────────
+
+  .form-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-hint {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .optional-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .count-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #1e3a5f;
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 7px;
+    margin-left: 4px;
+  }
+
+  // ─── Champs ───────────────────────────────────────────────────────────────
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .required { color: #dc2626; }
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+    color: #111827;
+    outline: none;
+    transition: border 0.15s;
+    background: #fff;
+
+    &:focus { border-color: #1e3a5f; }
+    &:disabled { background: #f9fafb; color: #9ca3af; }
+  }
+
+  .textarea { resize: vertical; }
+
+  // ─── Barre d'actions par étape ────────────────────────────────────────────
+
+  .step-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+
+    .right-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .submit-progress {
+      font-size: 0.82rem;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  // ─── Step 2 : Dropzone ────────────────────────────────────────────────────
+
+  .dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover { border-color: #1e3a5f; background: #f8faff; }
+
+    &.drag-over {
+      border-color: #1e3a5f;
+      background: #eff6ff;
+    }
+
+    .dropzone-inner { pointer-events: none; }
+
+    .dropzone-icon {
+      font-size: 2.2rem;
+      color: #9ca3af;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .dropzone-text {
+      font-size: 0.9rem;
+      color: #374151;
+      margin: 0 0 4px;
+
+      .dropzone-link {
+        color: #1e3a5f;
+        font-weight: 600;
+        text-decoration: underline;
+      }
+    }
+
+    .dropzone-hint {
+      font-size: 0.76rem;
+      color: #9ca3af;
+      margin: 0;
+    }
+  }
+
+  // ─── Liste des plans ──────────────────────────────────────────────────────
+
+  .plans-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .plan-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+
+    .plan-preview {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .plan-icon-pdf {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        font-size: 1.5rem;
+        color: #dc2626;
+      }
+    }
+
+    .plan-fields {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .plan-name-input { font-weight: 600; }
+    .plan-desc-input { font-size: 0.82rem; }
+  }
+
+  // ─── Step 3 : Layout deux colonnes ───────────────────────────────────────
+
+  .step3-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ─── Onglets ouvrage ──────────────────────────────────────────────────────
+
+  .ouvrage-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ouvrage-tab {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 5px 11px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:hover { background: #e0e7ff; border-color: #a5b4fc; color: #1e3a5f; }
+
+    &.active {
+      background: #1e3a5f;
+      border-color: #1e3a5f;
+      color: #fff;
+    }
+  }
+
+  // ─── Lignes de matériaux ouvrage ──────────────────────────────────────────
+
+  .ouvrage-materials {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ouvrage-mat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover:not(.added) {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    &.added {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      cursor: default;
+    }
+
+    .ouvrage-mat-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .ouvrage-mat-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .ouvrage-mat-desc {
+      font-size: 0.74rem;
+      color: #9ca3af;
+    }
+
+    .ouvrage-mat-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .ouvrage-mat-unit {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      background: #f3f4f6;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .add-icon { color: #9ca3af; font-size: 0.75rem; }
+    .added-icon { color: #059669; font-size: 0.85rem; }
+  }
+
+  // ─── Formulaire ajout matériau ────────────────────────────────────────────
+
+  .add-material-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px dashed #d1d5db;
+  }
+
+  .form-actions-sm {
+    display: flex;
+    gap: 10px;
+  }
+
+  // ─── Chips matériaux ──────────────────────────────────────────────────────
+
+  .materials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .material-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 8px 12px;
+
+    .chip-info {
+      display: flex;
+      flex-direction: column;
+
+      .chip-name { font-size: 0.88rem; font-weight: 600; color: #1e3a5f; }
+      .chip-unit { font-size: 0.75rem; color: #6b7280; }
+    }
+
+    .chip-remove {
+      background: none;
+      border: none;
+      color: #dc2626;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+
+      &:hover { background: #fee2e2; }
+    }
+  }
+
+  .empty-hint {
+    font-size: 0.82rem;
+    color: #9ca3af;
+    margin: 0;
+    text-align: center;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  // ─── Suggestions anciens projets ──────────────────────────────────────────
+
+  .suggestions-block {
+    border-top: 1px solid #f3f4f6;
+    padding-top: 14px;
+
+    .suggestions-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  .suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .suggestion-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover:not(:disabled) { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+
+    &.imported {
+      background: #d1fae5;
+      border-color: #6ee7b7;
+      color: #059669;
+      cursor: default;
+    }
+
+    &:disabled { cursor: default; }
+  }
+
+  // ─── Boutons ──────────────────────────────────────────────────────────────
+
+  .btn-outline {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) { background: #f3f4f6; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  .btn-outline-sm {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s;
+
+    &:hover { background: #f3f4f6; }
+  }
+
+  .sm { padding: 7px 14px; font-size: 0.82rem; }
+
+  // ── Panneau d'édition avant ajout ─────────────────────────────────────────
+  .edit-candidate-panel {
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 2px solid #6366f1;
+    border-radius: 10px;
+    background: #f5f3ff;
+    animation: slideDown 0.15s ease;
+
+    .edit-candidate-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #4f46e5;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field--unit { flex: 0 0 90px; }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+

@@ -1,0 +1,101 @@
+<div class="admin-users-content">
+    <div class="page-header">
+        <h1 class="page-title">Utilisateurs <span class="count-badge" *ngIf="!isLoading">{{ filteredUsers.length }}</span></h1>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="loading-state" *ngIf="isLoading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Chargement...
+    </div>
+
+    <ng-container *ngIf="!isLoading && !errorMessage">
+        <!-- Filtres -->
+        <div class="filters-bar">
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    placeholder="Rechercher par nom ou email..."
+                    [(ngModel)]="searchQuery"
+                    (ngModelChange)="applyFilters()"
+                />
+            </div>
+            <select [(ngModel)]="selectedPlan" (ngModelChange)="applyFilters()">
+                <option value="">Tous les plans</option>
+                <option *ngFor="let plan of plans" [value]="plan.id">{{ plan.name }}</option>
+            </select>
+        </div>
+
+        <!-- Tableau -->
+        <div class="section-card">
+            <table class="users-table" *ngIf="filteredUsers.length > 0; else empty">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Quota utilisé</th>
+                        <th>Quota restant</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of filteredUsers">
+                        <td class="id-cell">{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <!-- Lecture normale -->
+                            <span class="plan-badge" *ngIf="editingPlanUserId !== user.id">
+                                {{ getPlanName(user.plan_id) }}
+                            </span>
+                            <!-- Sélecteur inline -->
+                            <div class="plan-editor" *ngIf="editingPlanUserId === user.id">
+                                <select [(ngModel)]="editingPlanValue">
+                                    <option *ngFor="let plan of plans" [value]="plan.id">{{ plan.name }}</option>
+                                </select>
+                                <button class="btn-save" (click)="savePlan(user)" [disabled]="planSaving">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button class="btn-cancel" (click)="cancelEditPlan()" [disabled]="planSaving">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <!-- Feedback -->
+                            <span class="plan-feedback ok"  *ngIf="planFeedback?.userId === user.id && planFeedback?.ok">{{ planFeedback!.message }}</span>
+                            <span class="plan-feedback err" *ngIf="planFeedback?.userId === user.id && !planFeedback?.ok">{{ planFeedback!.message }}</span>
+                        </td>
+                        <td>{{ user.quota_used }}</td>
+                        <td class="quota-cell">
+                            <div class="quota-bar-wrap">
+                                <div class="quota-bar">
+                                    <div class="quota-fill"
+                                        [style.width]="getQuotaPercent(user) + '%'"
+                                        [class.warning]="getQuotaPercent(user) >= 70 && getQuotaPercent(user) < 90"
+                                        [class.danger]="getQuotaPercent(user) >= 90">
+                                    </div>
+                                </div>
+                                <span class="quota-text" [class.warning]="getQuotaPercent(user) >= 70 && getQuotaPercent(user) < 90" [class.danger]="getQuotaPercent(user) >= 90">
+                                    {{ getPlanQuota(user.plan_id) - user.quota_used }} restants
+                                </span>
+                            </div>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-edit-plan"
+                                *ngIf="editingPlanUserId !== user.id"
+                                (click)="startEditPlan(user)"
+                                title="Changer le plan">
+                                <i class="fa-solid fa-arrow-up-right-dots"></i> Upgrade plan
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ng-template #empty>
+                <p class="empty-state">Aucun utilisateur ne correspond à votre recherche.</p>
+            </ng-template>
+        </div>
+    </ng-container>
+</div>

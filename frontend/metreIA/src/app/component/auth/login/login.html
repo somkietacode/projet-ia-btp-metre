@@ -1,0 +1,46 @@
+<app-header></app-header>
+
+<div class="login-container">
+    <div class="login-form-container">
+        <h2>Se connecter à votre compte</h2>
+
+        <div class="error-banner" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    [(ngModel)]="email"
+                    required
+                    autocomplete="email"
+                    [disabled]="isLoading"
+                />
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    required
+                    autocomplete="current-password"
+                    [disabled]="isLoading"
+                />
+            </div>
+            <button
+                type="submit"
+                [disabled]="isLoading || loginForm.invalid"
+            >
+                {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
+            </button>
+        </form>
+
+        <p class="signup-link">Pas de compte ? <a routerLink="/auth/signup">S'inscrire</a></p>
+    </div>
+</div>

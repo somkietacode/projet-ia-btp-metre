@@ -1,0 +1,28 @@
+
+    .badge-1 {
+        border-radius: 5px;
+        background-color: #646464; /* Gris clair pour Basic */
+    }
+    .badge-2 {
+        background-color: #ffd700; /* Or pour Pro */
+        border-radius: 5px;
+
+    }
+    .badge-3 {
+        background-color: #4caf50; /* Vert pour Enterprise */
+        border-radius: 5px;
+
+    }
+    .badge-999 {
+        background-color: #ff4500; /* Rouge pour Super Admin */
+        border-radius: 5px;
+
+    }
+    
+    .badge-text {
+        color: #fff;
+        font-weight: bold;
+        font-size: 15px;
+        padding: 7px;
+        border-radius: 4px;
+    }
