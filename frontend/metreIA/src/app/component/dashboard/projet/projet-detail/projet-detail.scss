@@ -103,6 +103,40 @@
   font-weight: 500;
 }
 
+// ─── Journal d'activité temps réel ───────────────────────────────────────────
+
+.activity-log {
+  background: #1e1e2e;
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.78rem;
+
+  .activity-log-title {
+    color: #7c7caa;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    color: #c9d1d9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    .log-time { color: #586069; flex-shrink: 0; }
+    i { color: #58a6ff; flex-shrink: 0; width: 14px; text-align: center; }
+    .log-message { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+}
+
 // ─── Badges statut ────────────────────────────────────────────────────────────
 
 .status-badge {

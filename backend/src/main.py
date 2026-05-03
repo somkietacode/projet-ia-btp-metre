@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from typing import AsyncGenerator
 
 from fastapi import BackgroundTasks, Depends, FastAPI, File, Request, UploadFile
@@ -28,6 +29,8 @@ from lib.model import (
     WorkflowStatusResponse, ResumeWorkflowRequest,
 )
 from lib.smart_btp_agent import run_project_workflow, resume_project_workflow
+
+logger = logging.getLogger(__name__)
 from typing import Annotated
 import re
 from datetime import datetime, timedelta, timezone
@@ -943,6 +946,7 @@ async def _run_workflow_background(project_id: int, user_id: int) -> None:
     async def on_event(event_type: str, data: dict) -> None:
         await _publish_event(project_id, event_type, data)
 
+    logger.info("Workflow start project_id=%s user_id=%s", project_id, user_id)
     try:
         await run_project_workflow(
             project_id=project_id,
@@ -950,7 +954,9 @@ async def _run_workflow_background(project_id: int, user_id: int) -> None:
             db=db,
             event_callback=on_event,
         )
+        logger.info("Workflow done project_id=%s", project_id)
     except Exception as exc:  # noqa: BLE001
+        logger.exception("Workflow error project_id=%s: %s", project_id, exc)
         await _publish_event(project_id, "error", {"message": str(exc)})
     finally:
         db.close()

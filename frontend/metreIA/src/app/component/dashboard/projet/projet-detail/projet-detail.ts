@@ -42,6 +42,10 @@ export class ProjetDetail implements OnInit, OnDestroy {
   public liveQuotaUsed: number | null = null;
   public livePlanQuota: number | null = null;
 
+  // ─── Journal d'activité temps réel ──────────────────────────────────────────
+  public activityLog: { time: string; message: string; icon: string }[] = [];
+  private readonly MAX_LOG_ENTRIES = 50;
+
   // ─── SSE (Server-Sent Events) ───────────────────────────────────────────────
   private eventSource: EventSource | null = null;
 
@@ -99,6 +103,11 @@ export class ProjetDetail implements OnInit, OnDestroy {
 
   // ─── SSE — flux temps réel du workflow agentique ──────────────────────────
 
+  private addToLog(message: string, icon = 'fa-gear'): void {
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    this.activityLog = [{ time, message, icon }, ...this.activityLog].slice(0, this.MAX_LOG_ENTRIES);
+  }
+
   startSSE(): void {
     if (this.eventSource) return; // déjà connecté
     this.stopPolling();
@@ -130,6 +139,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
       case 'step':
         this.project.current_step = event.message ?? null;
         this.project.status = 'calcul_running';
+        this.addToLog(event.message ?? '...', 'fa-gear');
         break;
 
       case 'ouvrage': {
@@ -144,6 +154,11 @@ export class ProjetDetail implements OnInit, OnDestroy {
         };
         this.project.ouvrages = [...this.project.ouvrages, newOuvrage];
         this.project.current_step = `Ouvrage créé : ${event.name}`;
+        this.addToLog('Ouvrage créé : ' + event.name, 'fa-layer-group');
+        // Basculer automatiquement sur l'onglet ouvrages au 1er ouvrage
+        if (this.project.ouvrages.length === 1) {
+          this.activeTab = 'ouvrages';
+        }
         break;
       }
 
@@ -167,6 +182,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
             ...this.project.ouvrages.slice(ouvrageIdx + 1),
           ];
         }
+        this.addToLog((event.description ?? event.message ?? 'Calcul') + (event.quantity ? ' : ' + event.quantity + ' ' + (event.unit ?? '') : ''), 'fa-calculator');
         break;
       }
 
@@ -191,6 +207,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
         }
         this.project.status = 'waiting_user';
         this.activeTab = 'questions';
+        this.addToLog('Question : ' + event.text, 'fa-circle-question');
         break;
       }
 
@@ -202,6 +219,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
       case 'done':
         this.project.status = 'done';
         this.project.current_step = event.message ?? 'Calculs terminés';
+        this.addToLog('Analyse terminée', 'fa-circle-check');
         this.stopSSE();
         // Recharge complète pour avoir les données BDD à jour
         this.loadProject(true);
@@ -210,6 +228,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
       case 'error':
         this.project.status = 'error';
         this.errorMessage = event.message ?? 'Une erreur est survenue.';
+        this.addToLog('Erreur : ' + (event.message ?? ''), 'fa-triangle-exclamation');
         this.stopSSE();
         break;
 
@@ -315,6 +334,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
     if (!this.project || this.isRunningWorkflow) return;
     this.isRunningWorkflow = true;
     this.errorMessage = '';
+    this.activityLog = [];
     this.cdr.detectChanges();
     this.api.runProjectWorkflow(this.token, this.projectId).subscribe({
       next: () => {

@@ -42,6 +42,20 @@
     <span>{{ project.current_step }}</span>
   </div>
 
+  <!-- Journal d'activité temps réel -->
+  <div class="activity-log" *ngIf="activityLog.length > 0 && project.status === 'calcul_running'">
+    <div class="activity-log-title">
+      <i class="fa-solid fa-terminal"></i> Journal d'activité
+    </div>
+    <div class="activity-log-entries">
+      <div class="log-entry" *ngFor="let entry of activityLog">
+        <span class="log-time">{{ entry.time }}</span>
+        <i class="fa-solid" [ngClass]="entry.icon"></i>
+        <span class="log-message">{{ entry.message }}</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Quota tokens en temps réel -->
   <div class="quota-banner" *ngIf="liveQuotaUsed !== null && livePlanQuota !== null">
     <i class="fa-solid fa-coins"></i>
