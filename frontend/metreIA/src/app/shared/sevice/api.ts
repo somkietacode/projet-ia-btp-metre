@@ -6,7 +6,8 @@ import {
   PublicDocumentDetailResponse, PublicDocumentResponse, Token,
   UserDocumentDetailResponse, UserDocumentResponse, UserVectorSearchResponse,
   VectorSearchResponse, QuestionResponse,
-  MaterialResponse, ProjectSummaryResponse, ProjectDetailResponse,
+  MaterialCreateRequest, MaterialImportResult, MaterialResponse,
+  ProjectSummaryResponse, ProjectDetailResponse,
   ProjectCreateRequest, ProjectUpdateRequest, PlanBatimentResponse,
   WorkflowStatusResponse, AgentStreamEvent,
 } from '../model/interfaces';
@@ -273,7 +274,7 @@ export class Api {
     return this.http.post<ProjectDetailResponse>(`${this.baseUrl}/projects`, payload, { headers });
   }
 
-  /** GET /projects/materials — liste tous les matériaux de tous les projets de l'utilisateur */
+  /** GET /projects/materials — liste le catalogue global des matériaux */
   getAllUserMaterials(token: string): Observable<MaterialResponse[]> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     return this.http.get<MaterialResponse[]>(`${this.baseUrl}/projects/materials`, { headers });
@@ -362,6 +363,40 @@ export class Api {
   streamProjectEvents(token: string, projectId: number): EventSource {
     const url = `${this.baseUrl}/projects/${projectId}/stream?token=${encodeURIComponent(token)}`;
     return new EventSource(url);
+  }
+
+  // ─── Catalogue matériaux (admin) ──────────────────────────────────────────
+
+  /** GET /admin/materials — liste le catalogue global */
+  getAdminMaterials(token: string): Observable<MaterialResponse[]> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.get<MaterialResponse[]>(`${this.baseUrl}/admin/materials`, { headers });
+  }
+
+  /** POST /admin/materials — crée un matériau dans le catalogue global */
+  createAdminMaterial(token: string, payload: MaterialCreateRequest): Observable<MaterialResponse> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.post<MaterialResponse>(`${this.baseUrl}/admin/materials`, payload, { headers });
+  }
+
+  /** PATCH /admin/materials/{id} — met à jour un matériau */
+  updateAdminMaterial(token: string, id: number, payload: Partial<MaterialCreateRequest>): Observable<MaterialResponse> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.patch<MaterialResponse>(`${this.baseUrl}/admin/materials/${id}`, payload, { headers });
+  }
+
+  /** DELETE /admin/materials/{id} — supprime un matériau du catalogue */
+  deleteAdminMaterial(token: string, id: number): Observable<void> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.delete<void>(`${this.baseUrl}/admin/materials/${id}`, { headers });
+  }
+
+  /** POST /admin/materials/import — importe un fichier Excel dans le catalogue */
+  importAdminMaterials(token: string, file: File): Observable<MaterialImportResult> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<MaterialImportResult>(`${this.baseUrl}/admin/materials/import`, formData, { headers });
   }
 }
 

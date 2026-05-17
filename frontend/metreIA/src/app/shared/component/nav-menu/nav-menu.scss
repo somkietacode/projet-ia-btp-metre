@@ -1,57 +1,136 @@
+// ─── Dashboard sidebar ────────────────────────────────────────────────────────
+
 .nav-menu {
-    width: 200px;
-    background-color: #ffffff;
-    padding: 20px;
-    height: calc(100vh - 100px - 50px); /* Ajustez en fonction de la hauteur de votre header et footer */
+    width: 220px;
+    min-width: 220px;
+    background: var(--navy);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    gap: 4px;
+    transition: width var(--t-slow), min-width var(--t-slow);
+    overflow: hidden;
     position: relative;
+    flex-shrink: 0;
+
     &.collapsed {
         width: 60px;
+        min-width: 60px;
     }
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    li {
-        &.active {
-            background-color: #e0e0e0;
-            
-        }
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        padding: 5px;
-        border-radius: 5px;
-        &:hover {
-            background-color: #f0f0f0;
-        }
-        i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        span {
-            font-size: 16px;
-            &.collapsed {
-                display: none;
-            }
-        }
-        a {
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-    }
-
-    
 }
 
-.nav-menu i.fa-angle-left, .nav-menu i.fa-angle-right {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+// ─── Menu list ────────────────────────────────────────────────────────────────
+.menu-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.menu-item {
+    border-radius: var(--r-md);
+    transition: background var(--t-base);
+
+    a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--r-md);
+        transition: color var(--t-base), background var(--t-base);
+        white-space: nowrap;
+        overflow: hidden;
+
+        i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: color var(--t-base);
+        }
+
+        .menu-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+    }
+
+    &.active > a {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.14);
+        font-weight: 600;
+
+        i { color: var(--amber); }
+    }
+}
+
+// ─── Collapse toggle ──────────────────────────────────────────────────────────
+.nav-collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.5);
     cursor: pointer;
+    align-self: flex-end;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    transition: background var(--t-base), color var(--t-base);
+    flex-shrink: 0;
+
+    &:hover { background: rgba(255,255,255,.16); color: #fff; }
+}
+
+// ─── Legacy: inline icon used in template ────────────────────────────────────
+.nav-menu > i.fa-angle-left,
+.nav-menu > i.fa-angle-right {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,.4);
+    transition: color var(--t-base);
+    &:hover { color: #fff; }
+}
+
+// ─── Collapsed state ─────────────────────────────────────────────────────────
+.nav-menu.collapsed {
+    .menu-text { display: none; }
+
+    .menu-item a {
+        justify-content: center;
+        padding: 10px;
+        i { width: auto; }
+    }
+}
+
+// ─── Mobile: auto-collapse on small screens ───────────────────────────────────
+@media (max-width: 768px) {
+    .nav-menu {
+        width: 60px;
+        min-width: 60px;
+
+        .menu-text { display: none; }
+        .menu-item a { justify-content: center; padding: 10px; }
+        .nav-collapse-btn { display: none; }
+    }
 }

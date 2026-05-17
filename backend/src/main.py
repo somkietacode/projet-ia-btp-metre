@@ -22,7 +22,7 @@ from lib.model import (
     SearchRequest, VectorSearchResponse,
     UserDocumentResponse, UserDocumentDetailResponse, UserVectorSearchResponse,
     QuestionResponse, QuestionCreateRequest, AnswerRequest,
-    MaterialCreateRequest, MaterialResponse, PlanBatimentResponse,
+    MaterialCreateRequest, MaterialResponse, MaterialImportResult, PlanBatimentResponse,
     LigneDeCalculResponse, OuvrageResponse,
     ProjectSummaryResponse, ProjectDetailResponse,
     ProjectCreateRequest, ProjectUpdateRequest,
@@ -84,7 +84,7 @@ app = FastAPI(
         { "name" : "Knowledge Base", "description": "Base de connaissance privée de l'utilisateur (documents personnels, recherche vectorielle)" },
         { "name" : "Questions", "description": "Questions posées par le système à l'utilisateur, liées à un projet et un ouvrage" },
         { "name" : "Projects", "description": "Gestion des projets de calcul de métrés" },
-        { "name" : "Admin", "description": "Endpoints pour les opérations réservées aux administrateurs" },
+        { "name" : "Admin", "description": "Endpoints pour les opérations réservées aux administrateurs (utilisateurs, catalogue matériaux, base de connaissance publique)" },
     ],
     favicon="./static/favicon.ico"
 )
@@ -264,6 +264,225 @@ async def update_user_plan(
 async def read_admin_me(payload: Annotated[dict, Depends(require_role("admin"))], db: Annotated[Session, Depends(get_db)]):
     email = payload.get("sub")
     return MeAdminResponse(email=email)
+
+
+# ──────────────────────────────────────────────────────────────
+# Catalogue global de matériaux (admin)
+# ──────────────────────────────────────────────────────────────
+
+@app.get(
+    "/admin/materials",
+    tags=["Admin"],
+    response_model=list[MaterialResponse],
+    summary="Lister le catalogue global de matériaux",
+)
+async def admin_list_materials(
+    payload: Annotated[dict, Depends(require_role("admin"))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Retourne tous les matériaux du catalogue global."""
+    materials = db.query(Material).order_by(Material.name).all()
+    return [_build_material_response(m) for m in materials]
+
+
+@app.post(
+    "/admin/materials",
+    tags=["Admin"],
+    response_model=MaterialResponse,
+    status_code=201,
+    summary="Ajouter un matériau au catalogue",
+)
+async def admin_create_material(
+    mat: MaterialCreateRequest,
+    payload: Annotated[dict, Depends(require_role("admin"))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Crée un nouveau matériau dans le catalogue global."""
+    material = Material(
+        name=mat.name,
+        description=mat.description,
+        unite_defaut=mat.unite_defaut,
+        unite_commerciale=mat.unite_commerciale,
+        conditionnement=mat.conditionnement,
+        facteur_conversion=mat.facteur_conversion,
+    )
+    db.add(material)
+    db.commit()
+    db.refresh(material)
+    return _build_material_response(material)
+
+
+@app.patch(
+    "/admin/materials/{material_id}",
+    tags=["Admin"],
+    response_model=MaterialResponse,
+    summary="Mettre à jour un matériau du catalogue",
+)
+async def admin_update_material(
+    material_id: int,
+    mat: MaterialCreateRequest,
+    payload: Annotated[dict, Depends(require_role("admin"))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Met à jour un matériau existant du catalogue global."""
+    material = db.query(Material).filter(Material.id == material_id).first()
+    if not material:
+        raise CustomException("Matériau introuvable", status_code=404)
+    material.name = mat.name
+    material.description = mat.description
+    material.unite_defaut = mat.unite_defaut
+    material.unite_commerciale = mat.unite_commerciale
+    material.conditionnement = mat.conditionnement
+    material.facteur_conversion = mat.facteur_conversion
+    db.commit()
+    db.refresh(material)
+    return _build_material_response(material)
+
+
+@app.delete(
+    "/admin/materials/{material_id}",
+    tags=["Admin"],
+    status_code=204,
+    summary="Supprimer un matériau du catalogue",
+)
+async def admin_delete_material(
+    material_id: int,
+    payload: Annotated[dict, Depends(require_role("admin"))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Supprime un matériau du catalogue global."""
+    material = db.query(Material).filter(Material.id == material_id).first()
+    if not material:
+        raise CustomException("Matériau introuvable", status_code=404)
+    db.delete(material)
+    db.commit()
+
+
+@app.post(
+    "/admin/materials/import",
+    tags=["Admin"],
+    response_model=MaterialImportResult,
+    summary="Importer le catalogue depuis un fichier Excel",
+)
+async def admin_import_materials(
+    payload: Annotated[dict, Depends(require_role("admin"))],
+    db: Annotated[Session, Depends(get_db)],
+    file: UploadFile = File(...),
+):
+    """
+    Importe ou met à jour le catalogue de matériaux depuis un fichier Excel (.xlsx).
+
+    **Colonnes attendues** (noms insensibles à la casse) :
+
+    | Colonne               | Obligatoire | Description                              |
+    |-----------------------|-------------|------------------------------------------|
+    | `nom` / `designation` | ✓           | Nom du matériau                          |
+    | `description`         |             | Description détaillée                    |
+    | `unite` / `unité`     | ✓           | Unité technique (U, kg, sac, m², m³, ml) |
+    | `unite_commerciale`   |             | Unité fournisseur (palette, big-bag…)    |
+    | `conditionnement`     |             | Ex : "1 palette = 500 U"                 |
+    | `facteur_conversion`  |             | Nb d'unités techniques par unité commerciale |
+
+    Si un matériau avec le même nom existe déjà, il est mis à jour.
+    """
+    import io
+    import math as _math
+    import openpyxl
+
+    content = await file.read()
+    try:
+        wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True)
+    except Exception as exc:
+        raise CustomException(f"Fichier Excel invalide : {exc}", status_code=400)
+
+    ws = wb.active
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        raise CustomException("Le fichier Excel est vide.", status_code=400)
+
+    # Detect header row (first non-empty row)
+    headers = [str(h).strip().lower() if h is not None else "" for h in rows[0]]
+
+    _COL_MAP = {
+        "nom": "name", "designation": "name", "désignation": "name", "libellé": "name",
+        "name": "name",
+        "description": "description",
+        "unite": "unite_defaut", "unité": "unite_defaut", "unite_defaut": "unite_defaut",
+        "unité_defaut": "unite_defaut", "unite_technique": "unite_defaut",
+        "unite_commerciale": "unite_commerciale", "unité_commerciale": "unite_commerciale",
+        "conditionnement": "conditionnement",
+        "facteur_conversion": "facteur_conversion", "facteur": "facteur_conversion",
+    }
+
+    col_idx: dict[str, int] = {}
+    for i, h in enumerate(headers):
+        mapped = _COL_MAP.get(h)
+        if mapped and mapped not in col_idx:
+            col_idx[mapped] = i
+
+    if "name" not in col_idx or "unite_defaut" not in col_idx:
+        raise CustomException(
+            "Colonnes obligatoires manquantes : 'nom'/'designation' et 'unite'/'unité'.",
+            status_code=400,
+        )
+
+    created = 0
+    updated = 0
+    errors: list[str] = []
+
+    for row_num, row in enumerate(rows[1:], start=2):
+        name = str(row[col_idx["name"]]).strip() if row[col_idx["name"]] is not None else ""
+        if not name:
+            continue
+
+        unite_val = row[col_idx["unite_defaut"]]
+        unite_defaut = str(unite_val).strip() if unite_val is not None else ""
+        if not unite_defaut:
+            errors.append(f"Ligne {row_num} ({name}) : unité manquante, ignorée.")
+            continue
+
+        description = None
+        if "description" in col_idx and row[col_idx["description"]] is not None:
+            description = str(row[col_idx["description"]]).strip() or None
+
+        unite_commerciale = None
+        if "unite_commerciale" in col_idx and row[col_idx["unite_commerciale"]] is not None:
+            unite_commerciale = str(row[col_idx["unite_commerciale"]]).strip() or None
+
+        conditionnement = None
+        if "conditionnement" in col_idx and row[col_idx["conditionnement"]] is not None:
+            conditionnement = str(row[col_idx["conditionnement"]]).strip() or None
+
+        facteur_conversion = None
+        if "facteur_conversion" in col_idx and row[col_idx["facteur_conversion"]] is not None:
+            raw_fc = row[col_idx["facteur_conversion"]]
+            try:
+                fc = float(raw_fc)
+                facteur_conversion = fc if not _math.isnan(fc) else None
+            except (ValueError, TypeError):
+                errors.append(f"Ligne {row_num} ({name}) : facteur_conversion invalide, ignoré.")
+
+        existing = db.query(Material).filter(Material.name == name).first()
+        if existing:
+            existing.description = description
+            existing.unite_defaut = unite_defaut
+            existing.unite_commerciale = unite_commerciale
+            existing.conditionnement = conditionnement
+            existing.facteur_conversion = facteur_conversion
+            updated += 1
+        else:
+            db.add(Material(
+                name=name,
+                description=description,
+                unite_defaut=unite_defaut,
+                unite_commerciale=unite_commerciale,
+                conditionnement=conditionnement,
+                facteur_conversion=facteur_conversion,
+            ))
+            created += 1
+
+    db.commit()
+    return MaterialImportResult(created=created, updated=updated, errors=errors)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -791,7 +1010,9 @@ def _build_material_response(m: Material) -> MaterialResponse:
         name=m.name,
         description=m.description,
         unite_defaut=m.unite_defaut,
-        project_id=m.project_id,
+        unite_commerciale=m.unite_commerciale,
+        conditionnement=m.conditionnement,
+        facteur_conversion=m.facteur_conversion,
     )
 
 
@@ -813,6 +1034,8 @@ def _build_ouvrage_response(o: Ouvrage) -> OuvrageResponse:
             description=l.description,
             quantity=l.quantity,
             unit=l.unit,
+            commercial_quantity=l.commercial_quantity,
+            commercial_unit=l.commercial_unit,
             position=l.position,
             material=_build_material_response(l.material),
         )
@@ -830,6 +1053,8 @@ def _build_ouvrage_response(o: Ouvrage) -> OuvrageResponse:
 
 def _build_project_summary(p: Project) -> ProjectSummaryResponse:
     pending_questions = sum(1 for q in p.questions if q.status == "pending")
+    # Count distinct materials used in lignes_de_calcul
+    material_ids = {l.material_id for o in p.ouvrages for l in o.lignes_de_calcul if l.material_id}
     return ProjectSummaryResponse(
         id=p.id,
         name=p.name,
@@ -842,13 +1067,19 @@ def _build_project_summary(p: Project) -> ProjectSummaryResponse:
         ouvrages_count=len(p.ouvrages),
         questions_pending_count=pending_questions,
         plans_count=len(p.plans_batiment),
-        materials_count=len(p.materials),
+        materials_count=len(material_ids),
     )
 
 
 def _build_project_detail(p: Project) -> ProjectDetailResponse:
     summary = _build_project_summary(p)
-    materials = [_build_material_response(m) for m in p.materials]
+    # Collect unique materials used in this project's lignes_de_calcul
+    materials_used: dict[int, Material] = {}
+    for o in p.ouvrages:
+        for l in o.lignes_de_calcul:
+            if l.material and l.material.id not in materials_used:
+                materials_used[l.material.id] = l.material
+    materials = [_build_material_response(m) for m in materials_used.values()]
     ouvrages = [_build_ouvrage_response(o) for o in sorted(p.ouvrages, key=lambda x: x.position)]
     questions = [_build_question_response(q) for q in p.questions]
     plans = [_build_plan_batiment_response(pb) for pb in p.plans_batiment]
@@ -895,7 +1126,7 @@ async def create_project(
 ):
     """
     Crée un nouveau projet pour l'utilisateur connecté.
-    Les matériaux peuvent être fournis directement dans le payload.
+    Les matériaux disponibles sont ceux du catalogue global géré par l'admin.
     """
     now = datetime.now(timezone.utc).isoformat()
     project = Project(
@@ -907,22 +1138,11 @@ async def create_project(
         last_updated=now,
     )
     db.add(project)
-    db.flush()  # Obtenir l'ID avant le commit
-
-    for mat in payload.materials:
-        material = Material(
-            name=mat.name,
-            description=mat.description,
-            unite_defaut=mat.unite_defaut,
-            project_id=project.id,
-        )
-        db.add(material)
-
     db.commit()
     db.refresh(project)
     detail = _build_project_detail(project)
 
-    # Le workflow est déclenché manuellement via POST /projects/{id}/workflow
+    # Le workflow est déclenché manuellement via POST /projects/{id}/run
     # après que l'utilisateur a uploadé ses plans de bâtiment.
 
     return detail
@@ -966,22 +1186,17 @@ async def _run_workflow_background(project_id: int, user_id: int) -> None:
     "/projects/materials",
     tags=["Projects"],
     response_model=list[MaterialResponse],
-    summary="Lister tous mes matériaux (tous projets confondus)",
+    summary="Lister le catalogue global de matériaux",
 )
 async def list_all_user_materials(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[Session, Depends(get_db)],
 ):
     """
-    Retourne tous les matériaux utilisés dans les projets de l'utilisateur.
-    Utile pour proposer une réutilisation lors de la création d'un nouveau projet.
+    Retourne le catalogue global de matériaux (géré par l'admin).
+    Ces matériaux sont disponibles pour tous les projets.
     """
-    materials = (
-        db.query(Material)
-        .join(Material.project)
-        .filter(Project.user_id == current_user.id)
-        .all()
-    )
+    materials = db.query(Material).order_by(Material.name).all()
     return [_build_material_response(m) for m in materials]
 
 

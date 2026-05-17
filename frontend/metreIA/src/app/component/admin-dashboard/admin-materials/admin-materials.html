@@ -1,0 +1,176 @@
+<div class="materials-content">
+
+  <!-- ─── En-tête ─────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <h1 class="page-title">
+      Catalogue matériaux
+      <span class="count-badge" *ngIf="!isLoading">{{ materials.length }}</span>
+    </h1>
+    <button class="btn-primary" (click)="openCreateForm()" *ngIf="!showCreateForm">
+      <i class="fa-solid fa-plus"></i> Nouveau matériau
+    </button>
+  </div>
+
+  <!-- Messages globaux -->
+  <div class="error-banner" *ngIf="errorMessage">
+    <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+  </div>
+
+  <!-- ─── Import Excel ──────────────────────────────────────────────────────── -->
+  <div class="import-card">
+    <h2 class="card-title"><i class="fa-solid fa-file-excel"></i> Importer depuis Excel</h2>
+    <p class="card-hint">
+      Colonnes acceptées : <code>nom</code> (ou <code>designation</code>), <code>description</code>,
+      <code>unite</code> (ou <code>unité</code>), <code>unite_commerciale</code>,
+      <code>conditionnement</code>, <code>facteur_conversion</code>.<br />
+      Les matériaux existants (même nom) sont mis à jour, les nouveaux sont créés.
+    </p>
+
+    <div class="import-row">
+      <label class="file-label">
+        <i class="fa-solid fa-paperclip"></i>
+        {{ selectedImportFile ? selectedImportFile.name : 'Choisir un fichier Excel…' }}
+        <input type="file" hidden (change)="onImportFileSelected($event)" accept=".xlsx,.xls" />
+      </label>
+      <button class="btn-upload" [disabled]="!selectedImportFile || isImporting" (click)="importExcel()">
+        <i class="fa-solid fa-circle-notch fa-spin" *ngIf="isImporting"></i>
+        <i class="fa-solid fa-upload" *ngIf="!isImporting"></i>
+        {{ isImporting ? 'Import en cours…' : 'Importer' }}
+      </button>
+    </div>
+
+    <div class="import-error" *ngIf="importError">
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ importError }}
+    </div>
+    <div class="import-result" *ngIf="importResult">
+      <i class="fa-solid fa-circle-check"></i>
+      <strong>{{ importResult.created }}</strong> créé(s),
+      <strong>{{ importResult.updated }}</strong> mis à jour.
+      <ng-container *ngIf="importResult.errors.length > 0">
+        <span class="import-warnings"> — {{ importResult.errors.length }} avertissement(s) :</span>
+        <ul class="import-error-list">
+          <li *ngFor="let e of importResult.errors">{{ e }}</li>
+        </ul>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- ─── Formulaire de création ───────────────────────────────────────────── -->
+  <div class="form-card" *ngIf="showCreateForm">
+    <h2 class="card-title"><i class="fa-solid fa-plus"></i> Nouveau matériau</h2>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Nom <span class="required">*</span></label>
+        <input type="text" class="input" [(ngModel)]="newMaterial.name" placeholder="Béton C25/30" />
+      </div>
+      <div class="field">
+        <label>Unité de travail <span class="required">*</span></label>
+        <input type="text" class="input" [(ngModel)]="newMaterial.unite_defaut" placeholder="m³" />
+      </div>
+      <div class="field">
+        <label>Unité commerciale</label>
+        <input type="text" class="input" [(ngModel)]="newMaterial.unite_commerciale" placeholder="m³" />
+      </div>
+      <div class="field">
+        <label>Conditionnement</label>
+        <input type="text" class="input" [(ngModel)]="newMaterial.conditionnement" placeholder="Camion 6 m³" />
+      </div>
+      <div class="field">
+        <label>Facteur de conversion</label>
+        <input type="number" class="input" [(ngModel)]="newMaterial.facteur_conversion" placeholder="1.0" step="0.01" min="0" />
+      </div>
+      <div class="field field--full">
+        <label>Description</label>
+        <input type="text" class="input" [(ngModel)]="newMaterial.description" placeholder="Béton armé pour fondations…" />
+      </div>
+    </div>
+
+    <div class="error-banner sm" *ngIf="createError">{{ createError }}</div>
+
+    <div class="form-actions">
+      <button class="btn-outline" (click)="showCreateForm = false" [disabled]="isCreating">Annuler</button>
+      <button class="btn-primary" (click)="createMaterial()"
+        [disabled]="!newMaterial.name.trim() || !newMaterial.unite_defaut.trim() || isCreating">
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="isCreating"></i>
+        <i class="fa-solid fa-check" *ngIf="!isCreating"></i>
+        Créer
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Chargement ───────────────────────────────────────────────────────── -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fa-solid fa-spinner fa-spin"></i> Chargement du catalogue…
+  </div>
+
+  <!-- ─── Liste des matériaux ──────────────────────────────────────────────── -->
+  <div class="table-wrapper" *ngIf="!isLoading && materials.length > 0">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Unité travail</th>
+          <th>Unité comm.</th>
+          <th>Conditionnement</th>
+          <th class="text-right">Facteur conv.</th>
+          <th>Description</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ── Ligne d'édition ─────────────────────────────────────────────── -->
+        <ng-container *ngFor="let mat of materials">
+          <tr *ngIf="editingId !== mat.id">
+            <td class="font-bold">{{ mat.name }}</td>
+            <td class="text-muted">{{ mat.unite_defaut }}</td>
+            <td class="text-muted">{{ mat.unite_commerciale ?? '—' }}</td>
+            <td class="text-muted">{{ mat.conditionnement ?? '—' }}</td>
+            <td class="text-right text-muted">{{ mat.facteur_conversion ?? '—' }}</td>
+            <td class="text-muted truncate">{{ mat.description ?? '' }}</td>
+            <td class="col-actions">
+              <button class="btn-icon" title="Modifier" (click)="startEdit(mat)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn-icon danger" title="Supprimer"
+                (click)="deleteMaterial(mat)" [disabled]="deletingId === mat.id">
+                <i class="fa-solid fa-spinner fa-spin" *ngIf="deletingId === mat.id"></i>
+                <i class="fa-solid fa-trash" *ngIf="deletingId !== mat.id"></i>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Ligne en mode édition -->
+          <tr *ngIf="editingId === mat.id" class="edit-row">
+            <td><input type="text" class="input-sm" [(ngModel)]="editForm.name" /></td>
+            <td><input type="text" class="input-sm" [(ngModel)]="editForm.unite_defaut" /></td>
+            <td><input type="text" class="input-sm" [(ngModel)]="editForm.unite_commerciale" /></td>
+            <td><input type="text" class="input-sm" [(ngModel)]="editForm.conditionnement" /></td>
+            <td><input type="number" class="input-sm text-right" [(ngModel)]="editForm.facteur_conversion" step="0.01" min="0" /></td>
+            <td><input type="text" class="input-sm" [(ngModel)]="editForm.description" /></td>
+            <td class="col-actions">
+              <button class="btn-icon success" title="Enregistrer" (click)="saveEdit()"
+                [disabled]="!editForm.name.trim() || !editForm.unite_defaut.trim() || isSaving">
+                <i class="fa-solid fa-spinner fa-spin" *ngIf="isSaving"></i>
+                <i class="fa-solid fa-check" *ngIf="!isSaving"></i>
+              </button>
+              <button class="btn-icon" title="Annuler" (click)="cancelEdit()">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="editingId === mat.id && saveError" class="error-row">
+            <td colspan="7" class="error-cell">{{ saveError }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── État vide ─────────────────────────────────────────────────────────── -->
+  <div class="empty-state" *ngIf="!isLoading && materials.length === 0">
+    <i class="fa-solid fa-cubes"></i>
+    <p>Le catalogue est vide. Ajoutez des matériaux manuellement ou importez un fichier Excel.</p>
+  </div>
+
+</div>

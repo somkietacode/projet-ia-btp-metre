@@ -11,9 +11,9 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AdminDashboard {
   public adminMenuItems: NavMenuItem[] = [
-    { name: 'accueil',          icon: 'fa-solid fa-house',       route: '/admin/dashboard/home' },
-    { name: 'utilisateurs',     icon: 'fa-solid fa-users',       route: '/admin/dashboard/users' },
-    { name: 'base documentaire',icon: 'fa-solid fa-book-open',   route: '/admin/dashboard/knowledge-base' },
-    { name: 'paramètres',       icon: 'fa-solid fa-gear',        route: '/admin/dashboard/settings' },
+    { name: 'accueil',              icon: 'fa-solid fa-house',       route: '/admin/dashboard/home' },
+    { name: 'utilisateurs',         icon: 'fa-solid fa-users',       route: '/admin/dashboard/users' },
+    { name: 'catalogue matériaux',  icon: 'fa-solid fa-cubes',       route: '/admin/dashboard/materials' },
+    { name: 'base documentaire',    icon: 'fa-solid fa-book-open',   route: '/admin/dashboard/knowledge-base' },
   ];
 }

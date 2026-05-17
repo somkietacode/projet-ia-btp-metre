@@ -121,8 +121,10 @@
         <thead>
           <tr>
             <th>Matériau</th>
-            <th class="text-right">Quantité totale</th>
+            <th class="text-right">Qté technique</th>
             <th>Unité</th>
+            <th class="text-right">Qté commerciale</th>
+            <th>Unité comm.</th>
           </tr>
         </thead>
         <tbody>
@@ -130,6 +132,8 @@
             <td>{{ row.name }}</td>
             <td class="text-right font-mono">{{ row.total }}</td>
             <td class="text-muted">{{ row.unite }}</td>
+            <td class="text-right font-mono">{{ row.commercialTotal ?? '—' }}</td>
+            <td class="text-muted">{{ row.commercialUnit ?? '' }}</td>
           </tr>
         </tbody>
       </table>
@@ -232,6 +236,8 @@
               <th>Matériau</th>
               <th class="text-right">Quantité</th>
               <th>Unité</th>
+              <th class="text-right">Qté comm.</th>
+              <th>Unité comm.</th>
             </tr>
           </thead>
           <tbody>
@@ -240,6 +246,8 @@
               <td class="text-muted">{{ ligne.material.name }}</td>
               <td class="text-right font-mono">{{ ligne.quantity }}</td>
               <td class="text-muted">{{ ligne.unit }}</td>
+              <td class="text-right font-mono">{{ ligne.commercial_quantity ?? '—' }}</td>
+              <td class="text-muted">{{ ligne.commercial_unit ?? '' }}</td>
             </tr>
           </tbody>
         </table>

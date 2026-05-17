@@ -1,46 +1,91 @@
-<app-header></app-header>
+<div class="auth-page">
 
-<div class="admin-login-container">
-    <div class="admin-login-form-container">
-        <div class="admin-badge">Administration</div>
-        <h2>Connexion administrateur</h2>
-
-        <div class="error-banner" *ngIf="errorMessage">
-            {{ errorMessage }}
+    <!-- ─── Brand panel ─────────────────────────────────────────────────── -->
+    <div class="auth-brand admin-brand">
+        <a routerLink="/" class="brand-logo">
+            <img src="logo.svg" alt="Kube" class="brand-img">
+            <span>Kube</span>
+        </a>
+        <div class="brand-body">
+            <div class="admin-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <blockquote class="brand-quote">
+                Espace<br>Administration
+            </blockquote>
+            <p class="brand-desc">
+                Accès restreint aux administrateurs autorisés.<br>
+                Gérez les utilisateurs, quotas et base de connaissances.
+            </p>
         </div>
-
-        <form (ngSubmit)="onSubmit()" #adminLoginForm="ngForm" novalidate>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    [(ngModel)]="email"
-                    required
-                    autocomplete="email"
-                    [disabled]="isLoading"
-                />
-            </div>
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    [(ngModel)]="password"
-                    required
-                    autocomplete="current-password"
-                    [disabled]="isLoading"
-                />
-            </div>
-            <button
-                type="submit"
-                [disabled]="isLoading || adminLoginForm.invalid"
-            >
-                {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
-            </button>
-        </form>
+        <p class="brand-footer">Kube Admin · Accès sécurisé</p>
     </div>
+
+    <!-- ─── Form panel ──────────────────────────────────────────────────── -->
+    <div class="auth-form-panel">
+        <div class="auth-card">
+
+            <div class="auth-card-header">
+                <span class="admin-badge-pill">
+                    <i class="fa-solid fa-lock"></i> Administration
+                </span>
+                <h1 class="auth-title">Connexion admin</h1>
+                <p class="auth-subtitle">Identifiants administrateur requis</p>
+            </div>
+
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ errorMessage }}
+            </div>
+
+            <form (ngSubmit)="onSubmit()" #adminLoginForm="ngForm" novalidate class="auth-form">
+                <div class="field">
+                    <label for="email">Adresse e-mail</label>
+                    <div class="input-wrap">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            [(ngModel)]="email"
+                            required
+                            autocomplete="email"
+                            placeholder="admin@kube.io"
+                            [disabled]="isLoading"
+                        />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="password">Mot de passe</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            [(ngModel)]="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                            [disabled]="isLoading"
+                        />
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn admin-btn" [disabled]="isLoading || adminLoginForm.invalid">
+                    <i class="fa-solid fa-spinner fa-spin" *ngIf="isLoading"></i>
+                    <span>{{ isLoading ? 'Vérification…' : 'Accéder au panneau admin' }}</span>
+                    <i class="fa-solid fa-arrow-right" *ngIf="!isLoading"></i>
+                </button>
+            </form>
+
+            <p class="auth-alt">
+                <a routerLink="/auth/login">← Retour à la connexion utilisateur</a>
+            </p>
+
+        </div>
+    </div>
+
 </div>
 

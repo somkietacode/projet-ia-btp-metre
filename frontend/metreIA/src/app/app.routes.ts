@@ -14,6 +14,7 @@ import { AdminDashboard } from './component/admin-dashboard/admin-dashboard';
 import { AdminHome } from './component/admin-dashboard/admin-home/admin-home';
 import { AdminUsers } from './component/admin-dashboard/admin-users/admin-users';
 import { AdminKnowledgeBase } from './component/admin-dashboard/admin-knowledge-base/admin-knowledge-base';
+import { AdminMaterials } from './component/admin-dashboard/admin-materials/admin-materials';
 import { UserKnowledgeBase } from './component/dashboard/user-knowledge-base/user-knowledge-base';
 import { Questions } from './component/dashboard/questions/questions';
 
@@ -79,6 +80,9 @@ export const routes: Routes = [
             }, {
                 path: 'knowledge-base',
                 component: AdminKnowledgeBase
+            }, {
+                path: 'materials',
+                component: AdminMaterials
             }
         ]
     }

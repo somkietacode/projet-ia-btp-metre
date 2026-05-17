@@ -173,7 +173,9 @@ export class ProjetDetail implements OnInit, OnDestroy {
             quantity: event.quantity!,
             unit: event.unit!,
             position: ouvrage.lignes_de_calcul.length,
-            material: { id: 0, name: '', description: null, unite_defaut: event.unit!, project_id: this.projectId },
+            commercial_quantity: null,
+            commercial_unit: null,
+            material: { id: 0, name: '', description: null, unite_defaut: event.unit!, unite_commerciale: null, conditionnement: null, facteur_conversion: null },
           };
           const updated = { ...ouvrage, lignes_de_calcul: [...ouvrage.lignes_de_calcul, newLigne] };
           this.project.ouvrages = [
@@ -406,7 +408,7 @@ export class ProjetDetail implements OnInit, OnDestroy {
   exportResults(): void {
     if (!this.project || this.project.ouvrages.length === 0) return;
 
-    const lines: string[] = ['Ouvrage;Catégorie;Description;Matériau;Quantité;Unité'];
+    const lines: string[] = ['Ouvrage;Catégorie;Description;Matériau;Quantité;Unité;Qté commerciale;Unité commerciale'];
     for (const ouvrage of this.project.ouvrages) {
       for (const ligne of ouvrage.lignes_de_calcul) {
         lines.push([
@@ -416,6 +418,8 @@ export class ProjetDetail implements OnInit, OnDestroy {
           ligne.material.name,
           ligne.quantity.toString().replace('.', ','),
           ligne.unit,
+          ligne.commercial_quantity != null ? ligne.commercial_quantity.toString().replace('.', ',') : '',
+          ligne.commercial_unit ?? '',
         ].map(v => `"${v}"`).join(';'));
       }
     }
@@ -474,17 +478,27 @@ export class ProjetDetail implements OnInit, OnDestroy {
     }
   }
 
-  totalQuantityByMaterial(): { name: string; unite: string; total: number }[] {
+  totalQuantityByMaterial(): { name: string; unite: string; total: number; commercialTotal: number | null; commercialUnit: string | null }[] {
     if (!this.project) return [];
-    const map = new Map<string, { name: string; unite: string; total: number }>();
+    const map = new Map<string, { name: string; unite: string; total: number; commercialTotal: number | null; commercialUnit: string | null }>();
     for (const ouvrage of this.project.ouvrages) {
       for (const ligne of ouvrage.lignes_de_calcul) {
         const key = `${ligne.material.name}__${ligne.unit}`;
         const existing = map.get(key);
         if (existing) {
           existing.total += ligne.quantity;
+          if (ligne.commercial_quantity != null) {
+            existing.commercialTotal = (existing.commercialTotal ?? 0) + ligne.commercial_quantity;
+          }
+          if (ligne.commercial_unit) existing.commercialUnit = ligne.commercial_unit;
         } else {
-          map.set(key, { name: ligne.material.name, unite: ligne.unit, total: ligne.quantity });
+          map.set(key, {
+            name: ligne.material.name,
+            unite: ligne.unit,
+            total: ligne.quantity,
+            commercialTotal: ligne.commercial_quantity ?? null,
+            commercialUnit: ligne.commercial_unit ?? null,
+          });
         }
       }
     }

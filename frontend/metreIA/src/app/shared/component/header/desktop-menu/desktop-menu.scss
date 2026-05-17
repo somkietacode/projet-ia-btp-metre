@@ -1,21 +1,19 @@
-@media screen and (min-width: 1000px) {
-    .desktop-menu-container {
-        display: flex;
-        gap: 2rem;
-        a {
-            text-decoration: none;
-            color: #4a4a4a;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            &:hover {
-                color: #1d1d1d;
-            }
-        }
+.desktop-menu-container {
+    display: none;
 
+    @media (min-width: 1024px) {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+    }
+
+    a {
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-2);
+        transition: color var(--t-base);
+        &:hover { color: var(--text-1); }
     }
 }
-@media screen and (max-width: 1000px) {
-    .desktop-menu-container {
-        display: none
-    }
-}
+

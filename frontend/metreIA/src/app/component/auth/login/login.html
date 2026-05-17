@@ -1,46 +1,89 @@
-<app-header></app-header>
+<div class="auth-page">
 
-<div class="login-container">
-    <div class="login-form-container">
-        <h2>Se connecter à votre compte</h2>
+    <!-- ─── Brand panel ─────────────────────────────────────────────────── -->
+    <div class="auth-brand">
+        <a routerLink="/" class="brand-logo">
+            <img src="logo.svg" alt="Kube" class="brand-img">
+            <span>Kube</span>
+        </a>
+        <div class="brand-body">
+            <blockquote class="brand-quote">
+                "De votre plan PDF à vos quantités,<br>en 15 minutes."
+            </blockquote>
+            <p class="brand-desc">
+                La plateforme de métré intelligente pour les chefs de projet BTP.<br>
+                Extrayez, calculez, exportez — sans effort.
+            </p>
+            <ul class="brand-features">
+                <li><i class="fa-solid fa-check-circle"></i> Analyse automatique des plans</li>
+                <li><i class="fa-solid fa-check-circle"></i> Export Excel & PDF instantané</li>
+                <li><i class="fa-solid fa-check-circle"></i> 8 lots BTP couverts</li>
+            </ul>
+        </div>
+        <p class="brand-footer">© 2026 Kube · Plateforme BTP</p>
+    </div>
 
-        <div class="error-banner" *ngIf="errorMessage">
+    <!-- ─── Form panel ──────────────────────────────────────────────────── -->
+    <div class="auth-form-panel">
+        <div class="auth-card">
+
+            <div class="auth-card-header">
+                <h1 class="auth-title">Bon retour 👋</h1>
+                <p class="auth-subtitle">Connectez-vous à votre espace de travail</p>
+            </div>
+
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <i class="fa-solid fa-circle-exclamation"></i>
                 {{ errorMessage }}
             </div>
 
-        <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    [(ngModel)]="email"
-                    required
-                    autocomplete="email"
-                    [disabled]="isLoading"
-                />
-            </div>
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    [(ngModel)]="password"
-                    required
-                    autocomplete="current-password"
-                    [disabled]="isLoading"
-                />
-            </div>
-            <button
-                type="submit"
-                [disabled]="isLoading || loginForm.invalid"
-            >
-                {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
-            </button>
-        </form>
+            <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate class="auth-form">
+                <div class="field">
+                    <label for="email">Adresse e-mail</label>
+                    <div class="input-wrap">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            [(ngModel)]="email"
+                            required
+                            autocomplete="email"
+                            placeholder="vous@entreprise.com"
+                            [disabled]="isLoading"
+                        />
+                    </div>
+                </div>
 
-        <p class="signup-link">Pas de compte ? <a routerLink="/auth/signup">S'inscrire</a></p>
+                <div class="field">
+                    <label for="password">Mot de passe</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            [(ngModel)]="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                            [disabled]="isLoading"
+                        />
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn" [disabled]="isLoading || loginForm.invalid">
+                    <i class="fa-solid fa-spinner fa-spin" *ngIf="isLoading"></i>
+                    <span>{{ isLoading ? 'Connexion…' : 'Se connecter' }}</span>
+                    <i class="fa-solid fa-arrow-right" *ngIf="!isLoading"></i>
+                </button>
+            </form>
+
+            <p class="auth-alt">Pas encore de compte ?
+                <a routerLink="/auth/signup">Créer un compte</a>
+            </p>
+
+        </div>
     </div>
+
 </div>

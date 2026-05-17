@@ -1,0 +1,329 @@
+:host {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.materials-content {
+  flex: 1;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 28px 32px;
+
+  @media (max-width: 640px) { padding: 20px 16px; }
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .count-badge {
+    background: var(--navy);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: var(--r-f);
+  }
+
+  // ── Boutons ─────────────────────────────────────────────────────────────
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: var(--navy-800); }
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-2);
+    cursor: pointer;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: var(--surface-2); }
+  }
+
+  .btn-icon {
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-sm);
+    padding: 0.3rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background var(--t-base);
+
+    &:hover:not(:disabled) { background: var(--surface-2); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &.danger:hover:not(:disabled) { background: var(--red-l); border-color: #fca5a5; color: var(--red); }
+    &.success:hover:not(:disabled) { background: var(--emerald-l); border-color: #6ee7b7; color: var(--emerald); }
+  }
+
+  // ── Bannières ────────────────────────────────────────────────────────────
+
+  .error-banner {
+    background: var(--red-l);
+    border: 1px solid #fca5a5;
+    color: var(--red);
+    border-radius: var(--r-md);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+
+    &.sm { padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+  }
+
+  // ── Import Excel ─────────────────────────────────────────────────────────
+
+  .import-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-hint {
+    font-size: 0.8rem;
+    color: var(--text-3);
+    margin-bottom: 0.9rem;
+    line-height: 1.5;
+
+    code {
+      background: var(--border);
+      border-radius: var(--r-xs);
+      padding: 0.1rem 0.3rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .import-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1.5px dashed var(--border-2);
+    border-radius: var(--r-md);
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--text-2);
+    background: var(--surface-2);
+    transition: border-color var(--t-base);
+
+    &:hover { border-color: var(--navy); }
+  }
+
+  .btn-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: var(--navy-800); }
+  }
+
+  .import-error { color: var(--red); font-size: 0.8rem; margin-top: 0.6rem; }
+
+  .import-result {
+    color: var(--emerald);
+    font-size: 0.875rem;
+    margin-top: 0.6rem;
+
+    .import-warnings { color: #b45309; font-weight: 600; }
+    .import-error-list { color: #b45309; font-size: 0.8rem; margin: 0.25rem 0 0 1.2rem; }
+  }
+
+  // ── Formulaire création ───────────────────────────────────────────────────
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    &--full { grid-column: 1 / -1; }
+    label { font-size: 0.8rem; font-weight: 600; color: var(--text-2); }
+  }
+
+  .required { color: var(--red); }
+
+  .input {
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-md);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.875rem;
+    background: var(--surface);
+    color: var(--text-1);
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+
+    &:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,95,.12); }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  // ── Tableau ───────────────────────────────────────────────────────────────
+
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 0.65rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+      background: var(--surface-2);
+      text-align: left;
+      white-space: nowrap;
+
+      &.text-right { text-align: right; }
+    }
+
+    td {
+      padding: 0.6rem 0.9rem;
+      font-size: 0.875rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+
+    tr:hover td { background: var(--surface-2); }
+
+    .text-right { text-align: right; }
+    .text-muted { color: var(--text-3); }
+    .font-bold { font-weight: 600; }
+    .truncate { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .col-actions { width: 80px; white-space: nowrap; text-align: right; }
+
+    .edit-row td {
+      background: var(--navy-50);
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+
+    .error-row .error-cell {
+      color: var(--red);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.9rem 0.5rem;
+      background: var(--red-l);
+    }
+  }
+
+  .input-sm {
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-sm);
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+    width: 100%;
+    min-width: 80px;
+    background: var(--surface);
+    color: var(--text-1);
+    font-family: inherit;
+    outline: none;
+
+    &:focus { border-color: var(--navy); }
+    &.text-right { text-align: right; }
+  }
+
+  // ── État vide ─────────────────────────────────────────────────────────────
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-4);
+
+    i { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    p { font-size: 0.95rem; }
+  }
+}

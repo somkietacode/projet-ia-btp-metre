@@ -115,6 +115,15 @@ export interface MaterialCreateRequest {
   name: string;
   description?: string | null;
   unite_defaut: string;
+  unite_commerciale?: string | null;
+  conditionnement?: string | null;
+  facteur_conversion?: number | null;
+}
+
+export interface MaterialImportResult {
+  created: number;
+  updated: number;
+  errors: string[];
 }
 
 export interface MaterialResponse {
@@ -122,7 +131,9 @@ export interface MaterialResponse {
   name: string;
   description: string | null;
   unite_defaut: string;
-  project_id: number;
+  unite_commerciale: string | null;
+  conditionnement: string | null;
+  facteur_conversion: number | null;
 }
 
 export interface PlanBatimentResponse {
@@ -140,6 +151,8 @@ export interface LigneDeCalculResponse {
   quantity: number;
   unit: string;
   position: number;
+  commercial_quantity: number | null;
+  commercial_unit: string | null;
   material: MaterialResponse;
 }
 
@@ -177,7 +190,6 @@ export interface ProjectDetailResponse extends ProjectSummaryResponse {
 export interface ProjectCreateRequest {
   name: string;
   description?: string | null;
-  materials: MaterialCreateRequest[];
 }
 
 export interface ProjectUpdateRequest {

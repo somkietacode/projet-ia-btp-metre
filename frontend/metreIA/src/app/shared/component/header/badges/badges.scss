@@ -1,28 +1,20 @@
 
-    .badge-1 {
-        border-radius: 5px;
-        background-color: #646464; /* Gris clair pour Basic */
-    }
-    .badge-2 {
-        background-color: #ffd700; /* Or pour Pro */
-        border-radius: 5px;
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--r-xs);
+    padding: 3px 8px;
 
-    }
-    .badge-3 {
-        background-color: #4caf50; /* Vert pour Enterprise */
-        border-radius: 5px;
-
-    }
-    .badge-999 {
-        background-color: #ff4500; /* Rouge pour Super Admin */
-        border-radius: 5px;
-
-    }
-    
     .badge-text {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
         color: #fff;
-        font-weight: bold;
-        font-size: 15px;
-        padding: 7px;
-        border-radius: 4px;
     }
+}
+
+.badge-1   { background: var(--text-3); }
+.badge-2   { background: #b7791f; }
+.badge-3   { background: var(--emerald); }
+.badge-999 { background: var(--red); }

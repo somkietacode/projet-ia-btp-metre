@@ -372,30 +372,28 @@ class _TokenTracker(BaseCallbackHandler):
 
 
 
-        user = self.db.query(User).filter(User.id == self.user_id).first()
+        # Session dédiée pour éviter les conflits de thread avec la session partagée
+        from lib.core.orm_module import get_engine
+        from sqlalchemy.orm import sessionmaker as _SM
+        _factory = _SM(autocommit=False, autoflush=False, bind=get_engine())
+        token_db = _factory()
+        try:
+            user = token_db.query(User).filter(User.id == self.user_id).first()
 
-        if not user:
+            if not user:
+                return
 
-            return
-
-
-
-        user.quota_used = (user.quota_used or 0) + total_tokens
-
-        self.db.commit()
-
-
-
-        plan_quota = user.plan.quota if user.plan else 0
+            user.quota_used = (user.quota_used or 0) + total_tokens
+            new_quota_used = user.quota_used
+            plan_quota = user.plan.quota if user.plan else 0
+            token_db.commit()
+        finally:
+            token_db.close()
 
         _fire_event(
-
             self.event_callback,
-
             "quota",
-
-            {"quota_used": user.quota_used, "plan_quota": plan_quota},
-
+            {"quota_used": new_quota_used, "plan_quota": plan_quota},
         )
 
 
@@ -855,6 +853,10 @@ Analyser les plans de bâtiment d'un projet de construction et orchestrer le cal
 
 complet des quantités de matériaux nécessaires pour chaque ouvrage identifié.
 
+L'objectif final est de produire des quantités commerciales exploitables pour passer
+
+une commande fournisseur.
+
 
 
 MÉTHODE DE TRAVAIL
@@ -877,9 +879,13 @@ MÉTHODE DE TRAVAIL
 
       surfaces, longueurs, largeurs, hauteurs, volumes, nombre de baies, etc.
 
-   c. Liste EXPLICITEMENT dans la tâche les matériaux du projet (issus de
+   c. Liste EXPLICITEMENT dans la tâche les matériaux du CATALOGUE GLOBAL
 
-      list_project_materials) qui s'appliquent à cet ouvrage, avec leurs IDs.
+      (issus de list_project_materials) qui s'appliquent à cet ouvrage, avec leurs IDs.
+
+      IMPORTANT : tu ne peux utiliser QUE les matériaux présents dans le catalogue —
+
+      n'invente pas de matériaux inexistants.
 
    d. Délègue le calcul au Mettreur (delegate_to_mettreur).
 
@@ -893,7 +899,9 @@ MÉTHODE DE TRAVAIL
 
    (ask_user_question) — 3 questions maximum sur tout le projet.
 
-6. Une fois TOUS les ouvrages calculés, appelle mark_project_complete.
+6. Une fois TOUS les ouvrages calculés, appelle mark_project_complete avec un résumé
+
+   incluant les quantités commerciales totales par matériau (palettes, big-bags, sacs…).
 
 
 
@@ -915,13 +923,13 @@ Chaque tâche delegate_to_mettreur DOIT contenir :
 
 
 
-  MATÉRIAUX À CALCULER (avec leur ID en base) :
+  MATÉRIAUX À CALCULER (avec leur ID du catalogue global) :
 
     - [ID=n] Nom du matériau → formule ou méthode à appliquer
 
     - [ID=n] Nom du matériau → formule ou méthode à appliquer
 
-    ... (TOUS les matériaux applicables, aucun ne doit être omis)
+    ... (TOUS les matériaux applicables du catalogue, aucun ne doit être omis)
 
 
 
@@ -938,6 +946,10 @@ RÈGLES STRICTES
 - Travaille de manière séquentielle : crée l'ouvrage → délègue → lis le rapport → suivant.
 
 - Un ouvrage est valide uniquement si le Mettreur a produit une ligne par matériau listé.
+
+- Utilise UNIQUEMENT les matériaux du catalogue global (list_project_materials).
+
+  Ne demande pas au Mettreur de créer des matériaux — seul l'admin peut le faire.
 
 
 
@@ -963,27 +975,45 @@ en produisant une ligne de calcul (add_ligne_de_calcul) pour CHAQUE matériau li
 
 la tâche. Zéro omission est acceptable.
 
+La quantité commerciale (unité fournisseur) est calculée automatiquement à partir du
+
+facteur_conversion de chaque matériau lors de l'appel à add_ligne_de_calcul.
+
 
 
 MÉTHODE DE TRAVAIL
 
 1. Lis la tâche : relève chaque dimension (surface, longueur, hauteur, volume).
 
-2. Vérifie les matériaux existants (list_project_materials) ; crée ceux qui manquent.
+2. Consulte le catalogue global (list_project_materials) pour identifier les matériaux
 
-3. Pour CHAQUE matériau listé dans la tâche :
+   disponibles et leurs IDs. Tu ne peux PAS créer de nouveaux matériaux — utilise
 
-   a. Calcule la quantité via run_calculation avec la formule exacte.
+   uniquement ceux du catalogue. Si un matériau listé dans la tâche est absent du
+
+   catalogue, indique-le dans le rapport au lieu de le créer.
+
+3. Pour CHAQUE matériau listé dans la tâche ET présent dans le catalogue :
+
+   a. Calcule la quantité technique via run_calculation avec la formule exacte.
 
    b. Applique le coefficient de perte correspondant.
 
    c. Arrondis au nombre entier supérieur pour les unités discrètes (U, sac).
 
-   d. Enregistre la ligne (add_ligne_de_calcul).
+   d. Enregistre la ligne (add_ligne_de_calcul) — la quantité commerciale sera
+
+      calculée automatiquement si le matériau a un facteur_conversion défini.
 
 4. Rédige une note de calcul détaillée (create_note_de_calcul).
 
-5. Rédige le rapport de synthèse pour le Chef.
+5. Rédige le rapport de synthèse pour le Chef, incluant pour chaque matériau :
+
+   - Quantité technique (avec unité)
+
+   - Quantité commerciale (avec unité commerciale) si disponible
+
+   - Conditionnement applicable (ex : "12 palettes de 500 U")
 
 
 
@@ -1177,13 +1207,15 @@ RÈGLES ABSOLUES
 
 - Utilise TOUJOURS run_calculation pour les calculs — jamais de valeur inventée.
 
-- Produis une ligne add_ligne_de_calcul pour CHAQUE matériau du projet applicable.
+- Produis une ligne add_ligne_de_calcul pour CHAQUE matériau du catalogue applicable.
+
+- Ne crée JAMAIS de matériau : le catalogue est géré exclusivement par l'administrateur.
 
 - Les quantités doivent être cohérentes avec les dimensions : si surface = 20 m²
 
   et carrelage = 22 m², c'est correct (coeff 1.10) ; si carrelage = 5 m², c'est faux.
 
-- Si un matériau existe déjà (list_project_materials), utilise son ID existant.
+- Si un matériau listé dans la tâche est absent du catalogue, signale-le dans le rapport.
 
 - Arrondis toujours au sac/unité supérieur pour les conditionnements discrets.
 
@@ -1275,6 +1307,16 @@ def _make_chef_tools(
 
     """
 
+    # Chaque appel d'outil crée sa propre session SQLAlchemy isolée pour éviter
+    # les conflits de thread quand LangGraph exécute plusieurs outils en parallèle
+    # via asyncio.gather (ToolNode._afunc, tool_node.py:857).
+    from sqlalchemy.orm import sessionmaker as _SM
+    from lib.core.orm_module import get_engine as _get_engine
+    _SessionFactory = _SM(autocommit=False, autoflush=False, bind=_get_engine())
+
+    def _new_db():
+        return _SessionFactory()
+
 
 
     @tool
@@ -1283,43 +1325,51 @@ def _make_chef_tools(
 
         """Liste tous les plans de bâtiment attachés au projet courant."""
 
-        plans = (
+        _db = _new_db()
 
-            db.query(PlanBatiment)
+        try:
 
-            .filter(PlanBatiment.project_id == project_id)
+            plans = (
 
-            .all()
+                _db.query(PlanBatiment)
 
-        )
+                .filter(PlanBatiment.project_id == project_id)
 
-        return [
+                .all()
 
-            {
+            )
 
-                "id": p.id,
+            return [
 
-                "name": p.name,
+                {
 
-                "description": p.description,
+                    "id": p.id,
 
-                "extension": p.extension,
+                    "name": p.name,
 
-                "upload_date": p.upload_date,
+                    "description": p.description,
 
-                "has_content": bool(p.content),
+                    "extension": p.extension,
 
-                "needs_vision": (p.extension.lower().lstrip(".")) in {
+                    "upload_date": p.upload_date,
 
-                    "png", "jpg", "jpeg", "bmp", "tiff", "tif", "webp", "gif", "pdf"
+                    "has_content": bool(p.content),
 
-                },
+                    "needs_vision": (p.extension.lower().lstrip(".")) in {
 
-            }
+                        "png", "jpg", "jpeg", "bmp", "tiff", "tif", "webp", "gif", "pdf"
 
-            for p in plans
+                    },
 
-        ]
+                }
+
+                for p in plans
+
+            ]
+
+        finally:
+
+            _db.close()
 
 
 
@@ -1347,23 +1397,39 @@ def _make_chef_tools(
 
         """
 
-        plan = (
+        _db = _new_db()
 
-            db.query(PlanBatiment)
+        try:
 
-            .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
+            plan = (
 
-            .first()
+                _db.query(PlanBatiment)
 
-        )
+                .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
 
-        if not plan:
+                .first()
 
-            return f"Erreur : plan {plan_id} introuvable pour ce projet."
+            )
 
-        if not plan.content:
+            if not plan:
 
-            return f"Le plan '{plan.name}' n'a pas de contenu binaire enregistré."
+                return f"Erreur : plan {plan_id} introuvable pour ce projet."
+
+            # Lire les colonnes avant de fermer la session
+
+            plan_content = plan.content
+
+            plan_name = plan.name
+
+            plan_extension = plan.extension
+
+        finally:
+
+            _db.close()
+
+        if not plan_content:
+
+            return f"Le plan '{plan_name}' n'a pas de contenu binaire enregistré."
 
 
 
@@ -1373,7 +1439,7 @@ def _make_chef_tools(
 
         # légendes — sans passer par un OCR intermédiaire.
 
-        _ext = plan.extension.lower()
+        _ext = plan_extension.lower()
 
         if not _ext.startswith("."):
 
@@ -1383,15 +1449,15 @@ def _make_chef_tools(
 
         if _mime:
 
-            _fire_event(event_callback, "step", {"message": "Analyse visuelle du plan : " + plan.name + "..."})
+            _fire_event(event_callback, "step", {"message": "Analyse visuelle du plan : " + plan_name + "..."})
 
-            return _analyze_plan_with_vision(plan.content, _mime, plan.name)
+            return _analyze_plan_with_vision(plan_content, _mime, plan_name)
 
         if _ext == ".pdf":
 
-            _fire_event(event_callback, "step", {"message": "Analyse PDF du plan : " + plan.name + "..."})
+            _fire_event(event_callback, "step", {"message": "Analyse PDF du plan : " + plan_name + "..."})
 
-            return _analyze_plan_with_vision(plan.content, "application/pdf", plan.name)
+            return _analyze_plan_with_vision(plan_content, "application/pdf", plan_name)
 
 
 
@@ -1401,19 +1467,19 @@ def _make_chef_tools(
 
             with tempfile.NamedTemporaryFile(
 
-                delete=False, suffix=plan.extension
+                delete=False, suffix=plan_extension
 
             ) as tmp:
 
-                tmp.write(plan.content)
+                tmp.write(plan_content)
 
                 tmp_path = tmp.name
 
-            text = extract_content(tmp_path, extension=plan.extension)
+            text = extract_content(tmp_path, extension=plan_extension)
 
         except Exception as exc:  # noqa: BLE001
 
-            return f"Erreur lors de la lecture du plan '{plan.name}' : {exc}"
+            return f"Erreur lors de la lecture du plan '{plan_name}' : {exc}"
 
         finally:
 
@@ -1427,13 +1493,13 @@ def _make_chef_tools(
 
             return (
 
-                f"Le plan '{plan.name}' n'a pas pu être extrait "
+                f"Le plan '{plan_name}' n'a pas pu être extrait "
 
                 "(format non supporté ou plan illisible)."
 
             )
 
-        return f"=== Contenu du plan '{plan.name}' ===\n{text}"
+        return f"=== Contenu du plan '{plan_name}' ===\n{text}"
 
 
 
@@ -1463,21 +1529,31 @@ def _make_chef_tools(
 
         """
 
-        plan = (
+        _db = _new_db()
 
-            db.query(PlanBatiment)
+        try:
 
-            .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
+            plan = (
 
-            .first()
+                _db.query(PlanBatiment)
 
-        )
+                .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
 
-        if not plan or not plan.content:
+                .first()
 
-            return []
+            )
 
+            if not plan or not plan.content:
 
+                return []
+
+            _plan_content = plan.content
+
+            _plan_extension = plan.extension
+
+        finally:
+
+            _db.close()
 
         tmp_path: str | None = None
 
@@ -1485,11 +1561,11 @@ def _make_chef_tools(
 
             with tempfile.NamedTemporaryFile(
 
-                delete=False, suffix=plan.extension
+                delete=False, suffix=_plan_extension
 
             ) as tmp:
 
-                tmp.write(plan.content)
+                tmp.write(_plan_content)
 
                 tmp_path = tmp.name
 
@@ -1571,21 +1647,31 @@ def _make_chef_tools(
 
         """
 
-        plan = (
+        _db = _new_db()
 
-            db.query(PlanBatiment)
+        try:
 
-            .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
+            plan = (
 
-            .first()
+                _db.query(PlanBatiment)
 
-        )
+                .filter(PlanBatiment.id == plan_id, PlanBatiment.project_id == project_id)
 
-        if not plan or not plan.content:
+                .first()
 
-            return "Plan introuvable ou sans contenu."
+            )
 
+            if not plan or not plan.content:
 
+                return "Plan introuvable ou sans contenu."
+
+            _plan_content = plan.content
+
+            _plan_extension = plan.extension
+
+        finally:
+
+            _db.close()
 
         tmp_path: str | None = None
 
@@ -1593,11 +1679,11 @@ def _make_chef_tools(
 
             with tempfile.NamedTemporaryFile(
 
-                delete=False, suffix=plan.extension
+                delete=False, suffix=_plan_extension
 
             ) as tmp:
 
-                tmp.write(plan.content)
+                tmp.write(_plan_content)
 
                 tmp_path = tmp.name
 
@@ -1777,45 +1863,59 @@ def _make_chef_tools(
 
         """
 
-        position = db.query(Ouvrage).filter(Ouvrage.project_id == project_id).count()
+        _db = _new_db()
 
-        ouvrage = Ouvrage(
+        try:
 
-            name=name,
+            position = _db.query(Ouvrage).filter(Ouvrage.project_id == project_id).count()
 
-            categorie=categorie,
+            ouvrage = Ouvrage(
 
-            description=description,
+                name=name,
 
-            position=position,
+                categorie=categorie,
 
-            project_id=project_id,
+                description=description,
 
-        )
+                position=position,
 
-        db.add(ouvrage)
+                project_id=project_id,
 
-        db.commit()
+            )
 
-        db.refresh(ouvrage)
+            _db.add(ouvrage)
 
-        _update_project_step(db, project_id, f"Ouvrage créé : {name}")
+            _db.commit()
 
-        result = {
+            _db.refresh(ouvrage)
 
-            "id": ouvrage.id,
+            _update_project_step(_db, project_id, f"Ouvrage créé : {name}")
 
-            "name": ouvrage.name,
+            result = {
 
-            "categorie": ouvrage.categorie,
+                "id": ouvrage.id,
 
-            "description": ouvrage.description,
+                "name": ouvrage.name,
 
-        }
+                "categorie": ouvrage.categorie,
 
-        _fire_event(event_callback, "ouvrage", result)
+                "description": ouvrage.description,
 
-        return result
+            }
+
+            _fire_event(event_callback, "ouvrage", result)
+
+            return result
+
+        except Exception:
+
+            _db.rollback()
+
+            raise
+
+        finally:
+
+            _db.close()
 
 
 
@@ -1825,37 +1925,45 @@ def _make_chef_tools(
 
         """Liste tous les ouvrages créés pour le projet courant avec leur état."""
 
-        ouvrages = (
+        _db = _new_db()
 
-            db.query(Ouvrage)
+        try:
 
-            .filter(Ouvrage.project_id == project_id)
+            ouvrages = (
 
-            .order_by(Ouvrage.position)
+                _db.query(Ouvrage)
 
-            .all()
+                .filter(Ouvrage.project_id == project_id)
 
-        )
+                .order_by(Ouvrage.position)
 
-        return [
+                .all()
 
-            {
+            )
 
-                "id": o.id,
+            return [
 
-                "name": o.name,
+                {
 
-                "categorie": o.categorie,
+                    "id": o.id,
 
-                "description": o.description,
+                    "name": o.name,
 
-                "lignes_count": len(o.lignes_de_calcul),
+                    "categorie": o.categorie,
 
-            }
+                    "description": o.description,
 
-            for o in ouvrages
+                    "lignes_count": len(o.lignes_de_calcul),
 
-        ]
+                }
+
+                for o in ouvrages
+
+            ]
+
+        finally:
+
+            _db.close()
 
 
 
@@ -1895,57 +2003,67 @@ def _make_chef_tools(
 
         # Idempotence : ne pas créer deux fois la même question en cas de reprise
 
-        existing = (
+        # Session 1 : avant interrupt() — écriture de la question en BDD
 
-            db.query(Question)
+        _db1 = _new_db()
 
-            .filter(
+        try:
 
-                Question.project_id == project_id,
+            existing = (
 
-                Question.question_text == question_text,
+                _db1.query(Question)
 
-            )
+                .filter(
 
-            .first()
+                    Question.project_id == project_id,
 
-        )
+                    Question.question_text == question_text,
 
+                )
 
-
-        if existing is None:
-
-            q = Question(
-
-                project_id=project_id,
-
-                ouvrage_id=ouvrage_id,
-
-                question_text=question_text,
-
-                status="pending",
-
-                asked_date=datetime.now(timezone.utc).isoformat(),
+                .first()
 
             )
 
-            db.add(q)
+            if existing is None:
 
-            db.commit()
+                q = Question(
 
-            db.refresh(q)
+                    project_id=project_id,
 
-            question_id = q.id
+                    ouvrage_id=ouvrage_id,
 
-        else:
+                    question_text=question_text,
 
-            question_id = existing.id
+                    status="pending",
 
+                    asked_date=datetime.now(timezone.utc).isoformat(),
 
+                )
 
-        _update_project_status(db, project_id, "waiting_user", question_text[:120])
+                _db1.add(q)
 
+                _db1.commit()
 
+                _db1.refresh(q)
+
+                question_id = q.id
+
+            else:
+
+                question_id = existing.id
+
+            _update_project_status(_db1, project_id, "waiting_user", question_text[:120])
+
+        except Exception:
+
+            _db1.rollback()
+
+            raise
+
+        finally:
+
+            _db1.close()
 
         # ── Émission SSE avant la pause ──
 
@@ -1979,23 +2097,35 @@ def _make_chef_tools(
 
 
 
-        # ── Reprise : answer contient la réponse saisie par l'utilisateur ──
+        # ── Reprise : Session 2 — mise à jour de la réponse ──
 
-        q_db = db.query(Question).filter(Question.id == question_id).first()
+        _db2 = _new_db()
 
-        if q_db and q_db.status != "answered":
+        try:
 
-            q_db.answer_text = str(answer)
+            q_resume = _db2.query(Question).filter(Question.id == question_id).first()
 
-            q_db.status = "answered"
+            if q_resume and q_resume.status != "answered":
 
-            q_db.answered_date = datetime.now(timezone.utc).isoformat()
+                q_resume.answer_text = str(answer)
 
-            db.commit()
+                q_resume.status = "answered"
 
+                q_resume.answered_date = datetime.now(timezone.utc).isoformat()
 
+                _db2.commit()
 
-        _update_project_status(db, project_id, "calcul_running", "Reprise après réponse utilisateur")
+            _update_project_status(_db2, project_id, "calcul_running", "Reprise après réponse utilisateur")
+
+        except Exception:
+
+            _db2.rollback()
+
+            raise
+
+        finally:
+
+            _db2.close()
 
         return f"Réponse de l'utilisateur : {answer}"
 
@@ -2031,23 +2161,43 @@ def _make_chef_tools(
 
         """
 
-        ouvrage = (
+        _db = _new_db()
 
-            db.query(Ouvrage)
+        try:
 
-            .filter(Ouvrage.id == ouvrage_id, Ouvrage.project_id == project_id)
+            ouvrage = (
 
-            .first()
+                _db.query(Ouvrage)
 
-        )
+                .filter(Ouvrage.id == ouvrage_id, Ouvrage.project_id == project_id)
 
-        if not ouvrage:
+                .first()
 
-            return f"Erreur : ouvrage {ouvrage_id} introuvable dans ce projet."
+            )
 
+            if not ouvrage:
 
+                return f"Erreur : ouvrage {ouvrage_id} introuvable dans ce projet."
 
-        _update_project_step(db, project_id, f"Calcul métré : {ouvrage.name}")
+            _ouvrage_name = ouvrage.name
+
+            _ouvrage_cat = ouvrage.categorie
+
+            _ouvrage_desc = ouvrage.description
+
+            _update_project_step(_db, project_id, f"Calcul métré : {_ouvrage_name}")
+
+            _nb_mat = _db.query(Material).count()
+
+        except Exception:
+
+            _db.rollback()
+
+            raise
+
+        finally:
+
+            _db.close()
 
         _fire_event(
 
@@ -2055,7 +2205,7 @@ def _make_chef_tools(
 
             "step",
 
-            {"message": f"Calcul métré : {ouvrage.name}", "ouvrage_id": ouvrage_id},
+            {"message": f"Calcul métré : {_ouvrage_name}", "ouvrage_id": ouvrage_id},
 
         )
 
@@ -2065,11 +2215,9 @@ def _make_chef_tools(
 
         mettreur_graph = _build_mettreur_graph(db, project_id, user_id, ouvrage_id, event_callback)
 
-        # Limite intelligente : chaque materiau necessite ~12 steps dans le Mettreur
+        # Limite intelligente : chaque matériau nécessite ~8 steps dans le Mettreur
 
-        _nb_mat = db.query(Material).filter(Material.project_id == project_id).count()
-
-        _mettreur_limit = max(80, _nb_mat * 12 + 30)
+        _mettreur_limit = max(60, _nb_mat * 8 + 20)
 
         config = {
 
@@ -2085,9 +2233,9 @@ def _make_chef_tools(
 
                 f"Tâche de métré\n"
 
-                f"Ouvrage ID={ouvrage_id} : {ouvrage.name} ({ouvrage.categorie})"
+                f"Ouvrage ID={ouvrage_id} : {_ouvrage_name} ({_ouvrage_cat})"
 
-                + (f"\nDescription : {ouvrage.description}" if ouvrage.description else "")
+                + (f"\nDescription : {_ouvrage_desc}" if _ouvrage_desc else "")
 
                 + f"\n\n{task_description}"
 
@@ -2119,7 +2267,7 @@ def _make_chef_tools(
 
         report = _extract_text_content(last.content) if isinstance(last, AIMessage) else str(last)
 
-        return f"[Rapport Mettreur — {ouvrage.name}]\n{report}"
+        return f"[Rapport Mettreur — {_ouvrage_name}]\n{report}"
 
 
 
@@ -2147,13 +2295,69 @@ def _make_chef_tools(
 
         """
 
-        _update_project_status(db, project_id, "done", "Calculs terminés")
+        _db = _new_db()
+
+        try:
+
+            _update_project_status(_db, project_id, "done", "Calculs terminés")
+
+        except Exception:
+
+            _db.rollback()
+
+            raise
+
+        finally:
+
+            _db.close()
 
         _fire_event(event_callback, "done", {"message": summary[:300]})
 
         print(f"  [BTPAgent] Projet {project_id} terminé. Résumé : {summary[:200]}")
 
         return f"Projet {project_id} marqué comme terminé. {summary}"
+
+
+
+    @tool
+
+    def list_project_materials() -> list[dict]:
+
+        """Liste tous les materiaux du catalogue global disponibles pour le calcul."""
+
+        _db = _new_db()
+
+        try:
+
+            materials = _db.query(Material).order_by(Material.name).all()
+
+            return [
+
+                {
+
+                    "id": m.id,
+
+                    "name": m.name,
+
+                    "description": m.description,
+
+                    "unite_defaut": m.unite_defaut,
+
+                    "unite_commerciale": m.unite_commerciale,
+
+                    "conditionnement": m.conditionnement,
+
+                    "facteur_conversion": m.facteur_conversion,
+
+                }
+
+                for m in materials
+
+            ]
+
+        finally:
+
+            _db.close()
 
 
 
@@ -2174,6 +2378,8 @@ def _make_chef_tools(
         create_ouvrage,
 
         list_ouvrages,
+
+        list_project_materials,
 
         ask_user_question,
 
@@ -2216,6 +2422,14 @@ def _make_mettreur_tools(
     Toutes les fonctions sont des fermetures capturant le contexte BDD.
 
     """
+
+    # Session isolée par appel d'outil
+    from sqlalchemy.orm import sessionmaker as _SM
+    from lib.core.orm_module import get_engine as _get_engine
+    _SessionFactory = _SM(autocommit=False, autoflush=False, bind=_get_engine())
+
+    def _new_db():
+        return _SessionFactory()
 
 
 
@@ -2277,97 +2491,41 @@ def _make_mettreur_tools(
 
     def list_project_materials() -> list[dict]:
 
-        """Liste tous les matériaux déjà créés dans le projet courant."""
+        """Liste tous les matériaux du catalogue global disponibles pour le calcul."""
 
-        materials = (
+        _db = _new_db()
 
-            db.query(Material).filter(Material.project_id == project_id).all()
+        try:
 
-        )
+            materials = _db.query(Material).order_by(Material.name).all()
 
-        return [
+            return [
 
-            {
+                {
 
-                "id": m.id,
+                    "id": m.id,
 
-                "name": m.name,
+                    "name": m.name,
 
-                "description": m.description,
+                    "description": m.description,
 
-                "unite_defaut": m.unite_defaut,
+                    "unite_defaut": m.unite_defaut,
 
-            }
+                    "unite_commerciale": m.unite_commerciale,
 
-            for m in materials
+                    "conditionnement": m.conditionnement,
 
-        ]
+                    "facteur_conversion": m.facteur_conversion,
 
+                }
 
+                for m in materials
 
-    @tool
+            ]
 
-    def create_material(
+        finally:
 
-        name: str,
-
-        unite_defaut: str,
-
-        description: str | None = None,
-
-    ) -> dict:
-
-        """
-
-        Crée un nouveau matériau de construction dans le projet.
-
-        Vérifie d'abord l'existence via list_project_materials avant de créer.
-
-
-
-        Args:
-
-            name:          Nom du matériau (ex: "Parpaing 20×20×50 cm").
-
-            unite_defaut:  Unité parmi : U, kg, sac, m², m³, ml, t.
-
-            description:   Description complémentaire (optionnel).
-
-
-
-        Returns:
-
-            Dictionnaire ``{id, name, unite_defaut}``.
-
-        """
-
-        material = Material(
-
-            name=name,
-
-            description=description,
-
-            unite_defaut=unite_defaut,
-
-            project_id=project_id,
-
-        )
-
-        db.add(material)
-
-        db.commit()
-
-        db.refresh(material)
-
-        return {
-
-            "id": material.id,
-
-            "name": material.name,
-
-            "unite_defaut": material.unite_defaut,
-
-        }
+            _db.close()
 
 
 
@@ -2395,73 +2553,109 @@ def _make_mettreur_tools(
 
         Args:
 
-            material_id:  ID du matériau (obtenu via list_project_materials
-
-                          ou create_material).
+            material_id:  ID du matériau (obtenu via list_project_materials).
 
             description:  Libellé de la ligne (ex: "Parpaings mur façade nord RDC").
 
-            quantity:     Quantité calculée (valeur numérique positive).
+            quantity:     Quantité technique calculée (valeur numérique positive).
 
-            unit:         Unité de mesure (U, m², m³, ml, kg, sac, t).
+            unit:         Unité technique (U, m², m³, ml, kg, sac, t).
 
 
 
         Returns:
 
-            Dictionnaire ``{id, description, quantity, unit}``.
+            Dictionnaire ``{id, description, quantity, unit, commercial_quantity, commercial_unit}``.
 
         """
 
-        position = (
+        import math as _imath
 
-            db.query(LigneDeCalcul)
+        _db = _new_db()
 
-            .filter(LigneDeCalcul.ouvrage_id == ouvrage_id)
+        try:
 
-            .count()
+            position = (
 
-        )
+                _db.query(LigneDeCalcul)
 
-        ligne = LigneDeCalcul(
+                .filter(LigneDeCalcul.ouvrage_id == ouvrage_id)
 
-            ouvrage_id=ouvrage_id,
+                .count()
 
-            material_id=material_id,
+            )
 
-            description=description,
+            # Calcul de la quantité commerciale via facteur_conversion du catalogue
 
-            quantity=quantity,
+            mat = _db.query(Material).filter(Material.id == material_id).first()
 
-            unit=unit,
+            commercial_quantity: float | None = None
 
-            position=position,
+            commercial_unit: str | None = None
 
-        )
+            if mat and mat.facteur_conversion and mat.facteur_conversion > 0:
 
-        db.add(ligne)
+                commercial_quantity = float(_imath.ceil(quantity / mat.facteur_conversion))
 
-        db.commit()
+                commercial_unit = mat.unite_commerciale or mat.unite_defaut
 
-        db.refresh(ligne)
+            ligne = LigneDeCalcul(
 
-        result = {
+                ouvrage_id=ouvrage_id,
 
-            "id": ligne.id,
+                material_id=material_id,
 
-            "description": ligne.description,
+                description=description,
 
-            "quantity": ligne.quantity,
+                quantity=quantity,
 
-            "unit": ligne.unit,
+                unit=unit,
 
-            "ouvrage_id": ouvrage_id,
+                commercial_quantity=commercial_quantity,
 
-        }
+                commercial_unit=commercial_unit,
 
-        _fire_event(event_callback, "calcul", result)
+                position=position,
 
-        return {k: v for k, v in result.items() if k != "ouvrage_id"}
+            )
+
+            _db.add(ligne)
+
+            _db.commit()
+
+            _db.refresh(ligne)
+
+            result = {
+
+                "id": ligne.id,
+
+                "description": ligne.description,
+
+                "quantity": ligne.quantity,
+
+                "unit": ligne.unit,
+
+                "ouvrage_id": ouvrage_id,
+
+            }
+
+            result["commercial_quantity"] = ligne.commercial_quantity
+
+            result["commercial_unit"] = ligne.commercial_unit
+
+            _fire_event(event_callback, "calcul", result)
+
+            return {k: v for k, v in result.items() if k != "ouvrage_id"}
+
+        except Exception:
+
+            _db.rollback()
+
+            raise
+
+        finally:
+
+            _db.close()
 
 
 
@@ -2491,25 +2685,39 @@ def _make_mettreur_tools(
 
         """
 
-        note = NoteDeCalcul(
+        _db = _new_db()
 
-            title=title,
+        try:
 
-            contenu=contenu,
+            note = NoteDeCalcul(
 
-            ouvrage_id=ouvrage_id,
+                title=title,
 
-            calculation_date=datetime.now(timezone.utc).isoformat(),
+                contenu=contenu,
 
-        )
+                ouvrage_id=ouvrage_id,
 
-        db.add(note)
+                calculation_date=datetime.now(timezone.utc).isoformat(),
 
-        db.commit()
+            )
 
-        db.refresh(note)
+            _db.add(note)
 
-        return {"id": note.id, "title": note.title}
+            _db.commit()
+
+            _db.refresh(note)
+
+            return {"id": note.id, "title": note.title}
+
+        except Exception:
+
+            _db.rollback()
+
+            raise
+
+        finally:
+
+            _db.close()
 
 
 
@@ -2525,43 +2733,51 @@ def _make_mettreur_tools(
 
         """
 
-        ouvrage = db.query(Ouvrage).filter(Ouvrage.id == ouvrage_id).first()
+        _db = _new_db()
 
-        if not ouvrage:
+        try:
 
-            return {"error": f"Ouvrage {ouvrage_id} introuvable."}
+            ouvrage = _db.query(Ouvrage).filter(Ouvrage.id == ouvrage_id).first()
 
-        return {
+            if not ouvrage:
 
-            "id": ouvrage.id,
+                return {"error": f"Ouvrage {ouvrage_id} introuvable."}
 
-            "name": ouvrage.name,
+            return {
 
-            "categorie": ouvrage.categorie,
+                "id": ouvrage.id,
 
-            "description": ouvrage.description,
+                "name": ouvrage.name,
 
-            "lignes_de_calcul": [
+                "categorie": ouvrage.categorie,
 
-                {
+                "description": ouvrage.description,
 
-                    "id": l.id,
+                "lignes_de_calcul": [
 
-                    "description": l.description,
+                    {
 
-                    "quantity": l.quantity,
+                        "id": l.id,
 
-                    "unit": l.unit,
+                        "description": l.description,
 
-                    "material_name": l.material.name if l.material else "?",
+                        "quantity": l.quantity,
 
-                }
+                        "unit": l.unit,
 
-                for l in ouvrage.lignes_de_calcul
+                        "material_name": l.material.name if l.material else "?",
 
-            ],
+                    }
 
-        }
+                    for l in ouvrage.lignes_de_calcul
+
+                ],
+
+            }
+
+        finally:
+
+            _db.close()
 
 
 
@@ -2570,8 +2786,6 @@ def _make_mettreur_tools(
         run_calculation,
 
         list_project_materials,
-
-        create_material,
 
         add_ligne_de_calcul,
 
@@ -2757,9 +2971,26 @@ def _build_chef_graph(
 
     def chef_node(state: BTPAgentState) -> dict:
 
+        # Gemini rejette les AIMessage avec content vide meme quand tool_calls
+        # est present (erreur "contents are required" apres interrupt/resume).
+        # On remplace le contenu vide par un espace pour eviter ce bug.
+        sanitized: list[BaseMessage] = []
+        for msg in state["messages"]:
+            if (
+                isinstance(msg, AIMessage)
+                and getattr(msg, "tool_calls", None)
+                and not _extract_text_content(msg.content).strip()
+            ):
+                msg = AIMessage(
+                    content=" ",
+                    tool_calls=msg.tool_calls,
+                    id=msg.id,
+                )
+            sanitized.append(msg)
+
         response = llm_chef.invoke(
 
-            [SystemMessage(content=_CHEF_SYSTEM_PROMPT)] + state["messages"]
+            [SystemMessage(content=_CHEF_SYSTEM_PROMPT)] + sanitized
 
         )
 
@@ -3037,9 +3268,9 @@ async def run_project_workflow(
 
     config = _thread_config(project_id)
 
-    # Limite intelligente : nb_materiaux x 30 steps chef + 6 steps/plan + base 100
+    # Limite intelligente : nb_materiaux catalogue x 30 steps chef + 6 steps/plan + base 100
 
-    _nb_mat_run = db.query(Material).filter(Material.project_id == project_id).count()
+    _nb_mat_run = db.query(Material).count()
 
     config["recursion_limit"] = max(200, _nb_mat_run * 30 + len(plans) * 6 + 100)
 
@@ -3211,9 +3442,9 @@ async def resume_project_workflow(
 
     config = _thread_config(project_id)
 
-    # Limite intelligente : meme formule que run (materiaux deja crees a ce stade)
+    # Limite intelligente : meme formule que run (catalogue global)
 
-    _nb_mat_res = db.query(Material).filter(Material.project_id == project_id).count()
+    _nb_mat_res = db.query(Material).count()
 
     config["recursion_limit"] = max(200, _nb_mat_res * 30 + 100)
 

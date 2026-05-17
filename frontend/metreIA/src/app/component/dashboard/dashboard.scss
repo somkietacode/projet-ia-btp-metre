@@ -1,5 +1,8 @@
+:host { display: block; }
+
 .dashboard-content {
-    margin-top: 90px;
+    margin-top: var(--header-h);
     display: flex;
-    height: calc(100vh - 90px);
+    height: calc(100dvh - var(--header-h));
+    overflow: hidden;
 }

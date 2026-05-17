@@ -1,6 +1,8 @@
 .questions-page {
-    padding: 2rem;
+    padding: 28px 32px;
     max-width: 860px;
+
+    @media (max-width: 640px) { padding: 20px 16px; }
 
     // ─── En-tête ─────────────────────────────────────────────────────────────
     .page-header {
@@ -11,12 +13,13 @@
 
         .header-left {
             .page-title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #1e3a5f;
+                font-size: 1.375rem;
+                font-weight: 800;
+                color: var(--text-1);
                 margin: 0 0 0.25rem;
+                letter-spacing: -0.02em;
 
-                i { margin-right: 0.5rem; color: #3b82f6; }
+                i { margin-right: 0.5rem; color: var(--navy); }
             }
 
             .page-subtitle {
@@ -46,21 +49,22 @@
 
         .filter-btn {
             padding: 0.4rem 1rem;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            background: white;
-            color: #374151;
-            font-size: 0.85rem;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border-2);
+            background: var(--surface);
+            color: var(--text-2);
+            font-size: 0.82rem;
+            font-family: inherit;
             cursor: pointer;
-            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
 
             i { margin-right: 0.35rem; }
 
-            &:hover { background: #f3f4f6; }
+            &:hover { background: var(--surface-2); }
 
             &.active {
-                background: #1e3a5f;
-                border-color: #1e3a5f;
+                background: var(--navy);
+                border-color: var(--navy);
                 color: white;
             }
         }
@@ -100,17 +104,17 @@
 
     // ─── Carte question ───────────────────────────────────────────────────────
     .question-card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
         padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,.06);
-        transition: box-shadow 0.15s;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--t-base);
 
-        &:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+        &:hover { box-shadow: var(--shadow-md); }
 
-        &.pending { border-left: 4px solid #f59e0b; }
-        &.answered { border-left: 4px solid #10b981; }
+        &.pending { border-left: 4px solid var(--amber); }
+        &.answered { border-left: 4px solid var(--emerald); }
 
         // Contexte (badges projet / ouvrage / statut)
         .question-context {
@@ -127,8 +131,8 @@
                 border-radius: 999px;
                 i { margin-right: 0.3rem; }
 
-                &.project { background: #e8f0fe; color: #1e3a5f; }
-                &.ouvrage { background: #ede9fe; color: #6d28d9; }
+                &.project { background: var(--navy-50); color: var(--navy); }
+                &.ouvrage { background: var(--violet-l); color: var(--violet); }
             }
 
             .status-badge {
@@ -136,11 +140,11 @@
                 font-size: 0.75rem;
                 font-weight: 600;
                 padding: 0.2rem 0.6rem;
-                border-radius: 999px;
+                border-radius: var(--r-f);
                 i { margin-right: 0.3rem; }
 
-                &.pending { background: #fef3c7; color: #d97706; }
-                &.answered { background: #d1fae5; color: #059669; }
+                &.pending { background: var(--amber-50); color: #b45309; }
+                &.answered { background: var(--emerald-l); color: var(--emerald); }
             }
         }
 
@@ -155,7 +159,7 @@
                 width: 32px;
                 height: 32px;
                 border-radius: 50%;
-                background: #1e3a5f;
+                background: var(--navy);
                 color: white;
                 display: flex;
                 align-items: center;
@@ -165,21 +169,21 @@
             }
 
             .question-bubble {
-                background: #f0f4ff;
+                background: var(--navy-50);
                 border-radius: 0 10px 10px 10px;
                 padding: 0.75rem 1rem;
                 flex: 1;
 
                 .question-text {
                     margin: 0 0 0.4rem;
-                    font-size: 0.95rem;
-                    color: #111827;
+                    font-size: 0.9375rem;
+                    color: var(--text-1);
                     line-height: 1.5;
                 }
 
                 .question-date {
                     font-size: 0.75rem;
-                    color: #9ca3af;
+                    color: var(--text-4);
                 }
             }
         }
@@ -215,7 +219,7 @@
                 width: 32px;
                 height: 32px;
                 border-radius: 50%;
-                background: #059669;
+                background: var(--emerald);
                 color: white;
                 display: flex;
                 align-items: center;
@@ -232,16 +236,16 @@
             .btn-answer {
                 padding: 0.4rem 1rem;
                 border-radius: 6px;
-                border: 1px solid #1e3a5f;
-                background: white;
-                color: #1e3a5f;
+                border: 1px solid var(--navy);
+                background: var(--surface);
+                color: var(--navy);
                 font-size: 0.85rem;
                 font-weight: 500;
                 cursor: pointer;
                 transition: background 0.15s, color 0.15s;
 
                 i { margin-right: 0.35rem; }
-                &:hover { background: #1e3a5f; color: white; }
+                &:hover { background: var(--navy); color: white; }
             }
 
             .answer-form {
@@ -252,17 +256,17 @@
                 .answer-textarea {
                     width: 100%;
                     padding: 0.65rem 0.85rem;
-                    border: 1px solid #d1d5db;
-                    border-radius: 8px;
-                    font-size: 0.9rem;
+                    border: 1px solid var(--border-2);
+                    border-radius: var(--r-md);
+                    font-size: 0.875rem;
                     resize: vertical;
                     font-family: inherit;
                     box-sizing: border-box;
 
                     &:focus {
                         outline: none;
-                        border-color: #1e3a5f;
-                        box-shadow: 0 0 0 3px rgba(30,58,95,.1);
+                        border-color: var(--navy);
+                        box-shadow: 0 0 0 3px rgba(30,58,95,.12);
                     }
                 }
 
@@ -289,16 +293,17 @@
 
                     .btn-submit {
                         padding: 0.4rem 1rem;
-                        border-radius: 6px;
+                        border-radius: var(--r-md);
                         border: none;
-                        background: #1e3a5f;
+                        background: var(--navy);
                         color: white;
                         font-size: 0.85rem;
                         font-weight: 600;
+                        font-family: inherit;
                         cursor: pointer;
-                        transition: background 0.15s;
+                        transition: background var(--t-base);
 
-                        &:hover:not(:disabled) { background: #162d4a; }
+                        &:hover:not(:disabled) { background: var(--navy-800); }
                         &:disabled { opacity: 0.5; cursor: not-allowed; }
                         i { margin-right: 0.3rem; }
                     }

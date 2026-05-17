@@ -135,19 +135,31 @@ class AnswerRequest(BaseModel):
 # ──────────────────────────────────────────────────────────────
 
 class MaterialCreateRequest(BaseModel):
-    """Payload pour créer un matériau dans un projet."""
+    """Payload pour créer un matériau dans le catalogue global (admin)."""
     name: str
     description: str | None = None
     unite_defaut: str
+    unite_commerciale: str | None = None
+    conditionnement: str | None = None
+    facteur_conversion: float | None = None
 
 
 class MaterialResponse(BaseModel):
-    """Représentation d'un matériau de construction."""
+    """Représentation d'un matériau du catalogue global."""
     id: int
     name: str
     description: str | None
     unite_defaut: str
-    project_id: int
+    unite_commerciale: str | None
+    conditionnement: str | None
+    facteur_conversion: float | None
+
+
+class MaterialImportResult(BaseModel):
+    """Résultat d'un import de catalogue depuis un fichier Excel."""
+    created: int
+    updated: int
+    errors: list[str]
 
 
 class PlanBatimentResponse(BaseModel):
@@ -166,6 +178,8 @@ class LigneDeCalculResponse(BaseModel):
     description: str
     quantity: float
     unit: str
+    commercial_quantity: float | None
+    commercial_unit: str | None
     position: int
     material: MaterialResponse
 
@@ -208,7 +222,6 @@ class ProjectCreateRequest(BaseModel):
     """Payload pour créer un nouveau projet."""
     name: str
     description: str | None = None
-    materials: list[MaterialCreateRequest] = []
 
 
 class ProjectUpdateRequest(BaseModel):

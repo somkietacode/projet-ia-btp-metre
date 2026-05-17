@@ -110,7 +110,6 @@ class Project(Base):
 
     user: Mapped["User"] = relationship("User", back_populates="projects") # Relation avec la table "users" (clé étrangère vers "users.id")
     plans_batiment: Mapped[List["PlanBatiment"]] = relationship("PlanBatiment", back_populates="project", cascade="all, delete-orphan") # Relation avec la table "plans_batiment"
-    materials: Mapped[List["Material"]] = relationship("Material", back_populates="project", cascade="all, delete-orphan") # Relation avec la table "materials"
     ouvrages: Mapped[List["Ouvrage"]] = relationship("Ouvrage", back_populates="project", cascade="all, delete-orphan") # Relation avec la table "ouvrages"
     questions: Mapped[List["Question"]] = relationship("Question", back_populates="project", cascade="all, delete-orphan") # Relation avec la table "questions"
 
@@ -154,15 +153,15 @@ class NoteDeCalcul(Base):
 class Material(Base):
     __tablename__ = "materials"
 
-    # Définition d'un matériau de construction
+    # Catalogue global de matériaux de construction (géré par l'admin)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False) # Nom du matériau (ex: "Brique", "Ciment", etc.)
     description: Mapped[Optional[str]] = mapped_column(nullable=True) # Description du matériau (ex: "Brique creuse 20x20x50")
-    unite_defaut: Mapped[str] = mapped_column(nullable=False) # Unité par défaut du matériau (ex: "U", "kg", "sac", "m³")
-    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False) # ID du projet auquel appartient le matériau
-
-    project: Mapped["Project"] = relationship("Project", back_populates="materials") # Relation avec la table "projects" (clé étrangère vers "projects.id")
+    unite_defaut: Mapped[str] = mapped_column(nullable=False) # Unité technique de calcul (ex: "U", "kg", "sac", "m³")
+    unite_commerciale: Mapped[Optional[str]] = mapped_column(nullable=True) # Unité commerciale fournisseur (ex: "palette", "big-bag")
+    conditionnement: Mapped[Optional[str]] = mapped_column(nullable=True) # Description du conditionnement (ex: "1 palette = 500 U", "sac 50 kg")
+    facteur_conversion: Mapped[Optional[float]] = mapped_column(nullable=True) # Facteur technique → commercial (ex: 500 pour U→palette)
 
     def __repr__(self):
         return f"<Material(id={self.id}, name='{self.name}', unite_defaut='{self.unite_defaut}')>"
@@ -197,8 +196,10 @@ class LigneDeCalcul(Base):
     ouvrage_id: Mapped[int] = mapped_column(ForeignKey("ouvrages.id"), nullable=False) # ID de l'ouvrage auquel appartient la ligne de calcul
     material_id: Mapped[int] = mapped_column(ForeignKey("materials.id"), nullable=False) # ID du matériau utilisé dans la ligne de calcul
     description: Mapped[str] = mapped_column(nullable=False) # Description de la ligne (ex: "Briques mur façade nord RDC")
-    quantity: Mapped[float] = mapped_column(nullable=False) # Quantité du matériau (ex: 450 briques, 12 sacs)
-    unit: Mapped[str] = mapped_column(nullable=False) # Unité de la quantité (ex: "U", "kg", "sac", "m³")
+    quantity: Mapped[float] = mapped_column(nullable=False) # Quantité technique calculée (ex: 450 briques, 12 sacs)
+    unit: Mapped[str] = mapped_column(nullable=False) # Unité technique (ex: "U", "kg", "sac", "m³")
+    commercial_quantity: Mapped[Optional[float]] = mapped_column(nullable=True) # Quantité commerciale (convertie via facteur_conversion)
+    commercial_unit: Mapped[Optional[str]] = mapped_column(nullable=True) # Unité commerciale (ex: "palette", "big-bag")
     position: Mapped[int] = mapped_column(nullable=False, default=0) # Ordre d'affichage
 
     ouvrage: Mapped["Ouvrage"] = relationship("Ouvrage", back_populates="lignes_de_calcul") # Relation avec la table "ouvrages"

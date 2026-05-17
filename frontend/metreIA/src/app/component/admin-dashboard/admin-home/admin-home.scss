@@ -5,32 +5,38 @@
 
 .admin-home-content {
     flex: 1;
-    background-color: rgb(246, 246, 246);
-    padding: 30px;
+    background: var(--bg);
+    padding: 28px 32px;
     overflow-y: auto;
+
+    @media (max-width: 640px) { padding: 20px 16px; }
 
     .page-header {
         margin-bottom: 28px;
     }
 
     .page-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #1e3a5f;
+        font-size: 1.375rem;
+        font-weight: 800;
+        color: var(--text-1);
         margin: 0;
+        letter-spacing: -0.02em;
     }
 
     .error-banner {
-        background-color: #fef2f2;
-        color: #b91c1c;
+        background: var(--red-l);
+        color: #991b1b;
         border: 1px solid #fca5a5;
-        border-radius: 4px;
+        border-radius: var(--r-md);
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .loading-state {
-        color: #6b7280;
+        color: var(--text-3);
         font-size: 1rem;
         display: flex;
         align-items: center;
@@ -47,13 +53,17 @@
     }
 
     .stat-card {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-sm);
         padding: 20px;
         display: flex;
         align-items: center;
         gap: 16px;
+        transition: box-shadow var(--t-base), transform var(--t-base);
+
+        &:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
         .stat-icon {
             width: 48px;
@@ -72,14 +82,14 @@
 
             .stat-value {
                 font-size: 1.6rem;
-                font-weight: 700;
-                color: #111827;
+                font-weight: 800;
+                color: var(--text-1);
                 line-height: 1;
             }
 
             .stat-label {
                 font-size: 0.8rem;
-                color: #6b7280;
+                color: var(--text-3);
                 margin-top: 4px;
             }
         }
@@ -88,9 +98,10 @@
     // ─── Section card ─────────────────────────────────────────────
 
     .section-card {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-sm);
         padding: 20px;
 
         .section-header {
@@ -100,19 +111,20 @@
             margin-bottom: 16px;
 
             h2 {
-                font-size: 1.05rem;
-                font-weight: 600;
-                color: #1e3a5f;
+                font-size: 0.9375rem;
+                font-weight: 700;
+                color: var(--navy);
                 margin: 0;
             }
 
             .see-all {
-                font-size: 0.85rem;
-                color: #1e3a5f;
+                font-size: 0.82rem;
+                color: var(--navy);
                 text-decoration: none;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 4px;
+                font-weight: 600;
 
                 &:hover { text-decoration: underline; }
             }
@@ -125,32 +137,34 @@
             th, td {
                 padding: 10px 14px;
                 text-align: left;
-                font-size: 0.9rem;
-                border-bottom: 1px solid #f3f4f6;
+                font-size: 0.875rem;
+                border-bottom: 1px solid var(--border);
             }
 
             th {
-                color: #6b7280;
+                color: var(--text-3);
                 font-weight: 600;
-                font-size: 0.78rem;
+                font-size: 0.75rem;
                 text-transform: uppercase;
-                letter-spacing: 0.04em;
+                letter-spacing: 0.05em;
+                background: var(--surface-2);
             }
 
-            tbody tr:hover { background-color: #f9fafb; }
+            tbody tr:last-child td { border-bottom: none; }
+            tbody tr:hover { background: var(--surface-2); }
         }
 
         .plan-badge {
-            background-color: #e8f0fe;
-            color: #1e3a5f;
-            font-size: 0.75rem;
+            background: var(--navy-50);
+            color: var(--navy);
+            font-size: 0.72rem;
             font-weight: 600;
             padding: 2px 10px;
-            border-radius: 999px;
+            border-radius: var(--r-f);
         }
 
         .empty-state {
-            color: #9ca3af;
+            color: var(--text-4);
             font-size: 0.95rem;
             text-align: center;
             padding: 20px 0;
